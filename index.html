@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<title>ولا كلمة عالسريع</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap');
+*{box-sizing:border-box;font-family:'Cairo',sans-serif}
+:root{--pink:#f72585;--pink-dark:#b5179e;--mint:#06d6a0;--amber:#ffb703;--red:#ef233c;--blue:#00b4d8;--panel:#1b263b;--glass:rgba(255,255,255,.06)}
+html,body{height:100%;overflow-x:hidden}
+body{margin:0;color:#fff;min-height:100vh;transition:background-image .5s ease;background-color:#DFDBE5;background-image:url("https://i.ibb.co/Y4LZLZBW/Chat-GPT-Image-Aug-2-2025-03-33-53-PM.png");background-size:500px;background-repeat:repeat;background-position:center;background-attachment:scroll}
+button{padding:.9rem 1.2rem;font-size:1rem;border:none;border-radius:12px;cursor:pointer;background:#f72585;color:#fff;transition:transform .08s ease,background .25s,box-shadow .25s}
+button:hover{background:#b5179e;box-shadow:0 8px 24px rgba(247,37,133,.25)}
+button:active{transform:scale(.98)}
+.btn-lg{font-size:1.1rem;padding:1rem 1.4rem;border-radius:14px}
+.btn-ghost{background:transparent;border:1px solid #2e4670}
+.btn-correct{background:#06d6a0!important;color:#012d26}
+.btn-wrong{background:#ef233c!important}
+.btn-skip{background:#00b4d8!important;color:#001b2a}
+.btn-end{background:#4b5563!important}
+.badge{display:inline-flex;align-items:center;gap:.35rem;padding:.25rem .6rem;background:#24364f;border-radius:999px;font-size:.85rem}
+.hero{position:relative;display:flex;align-items:center;justify-content:center;min-height:calc(100vh - 4rem);padding:2rem}
+.hero .card{position:relative;background:var(--glass);backdrop-filter:blur(8px);border:1px solid #2a3f63;border-radius:18px;padding:1.2rem;width:min(92vw,720px);box-shadow:0 10px 30px rgba(0,0,0,.35);margin:0 auto}
+.title{font-size:2.2rem;margin:.4rem 0 0;text-align:center;text-shadow:0 0 12px #000;animation:pulse 2.8s infinite}
+@keyframes pulse{0%{text-shadow:0 0 6px #000}50%{text-shadow:0 0 18px #f72585}100%{text-shadow:0 0 6px #000}}
+.hero-grid{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.8rem}
+.hero .panel{background:#0f1b2d;border:1px solid #2a3f63;border-radius:14px;padding:.9rem;min-height:220px}
+.hero .actions{display:flex;gap:.6rem;flex-wrap:wrap;justify-content:center;margin-top:.6rem}
+.hero .stat{display:flex;gap:.5rem;flex-wrap:wrap;justify-content:center;margin-top:.4rem}
+.spark{position:fixed;inset:0;background:radial-gradient(600px 300px at 10% 10%,rgba(247,37,133,.08),transparent 60%),radial-gradient(500px 260px at 90% 20%,rgba(0,180,216,.08),transparent 60%),radial-gradient(500px 260px at 50% 100%,rgba(6,214,160,.08),transparent 60%);pointer-events:none}
+#gameArea{display:none;flex-direction:column;align-items:center;gap:.8rem;background:rgba(0,0,0,.55);padding:1.2rem 1.4rem;border-radius:14px;backdrop-filter:blur(6px);width:min(92vw,560px);margin:2rem auto}
+.row{display:flex;gap:.5rem;align-items:center;justify-content:center;flex-wrap:wrap}
+#qr{width:256px;height:256px;background:#fff;padding:.5rem;border-radius:14px;display:flex;align-items:center;justify-content:center;box-shadow:0 0 0 0 rgba(255,255,255,.8);transition:box-shadow .3s ease}
+#qr.special{box-shadow:0 0 0 8px rgba(247,37,133,.35),0 0 22px 6px rgba(247,37,133,.35)}
+#answer{font-size:1.6rem;font-weight:700;display:none}
+#hint{font-size:1rem;color:#111;min-height:1.2rem}
+#scoreboard{display:flex;gap:.5rem;flex-wrap:wrap;justify-content:center}
+.player{background:#415a77;padding:.35rem .75rem;border-radius:10px;font-size:.95rem;display:flex;align-items:center;gap:.35rem;transition:transform .2s}
+.player.active{outline:2px solid #06d6a0;transform:scale(1.03)}
+.player span{font-weight:700}
+#progress,#timer{font-size:1rem;background:#27384e;padding:.25rem .6rem;border-radius:8px}
+#timer.low{animation:blink 1s infinite;background:#5a1f2b}
+@keyframes blink{50%{filter:brightness(1.7)}}
+.controls-inline{display:flex;gap:.4rem;flex-wrap:wrap;justify-content:center}
+.game-footer{display:flex;gap:.6rem;justify-content:center;margin-top:.4rem}
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.8);display:none;align-items:center;justify-content:center;z-index:120}
+.modal.active{display:flex}
+.modal .sheet{background:#1b263b;border-radius:14px;width:min(96vw,760px);padding:1rem 1.2rem;position:relative}
+.modal .close{position:absolute;top:8px;right:8px;width:36px;height:36px;border-radius:10px;background:transparent;border:1px solid #2e4670;color:#fff;font-size:20px;line-height:1;display:flex;align-items:center;justify-content:center;cursor:pointer}
+.modal .close:hover{background:#2a3f63}
+.stepbar{display:flex;gap:.4rem;margin:.3rem 0 1rem;justify-content:center}
+.step{padding:.35rem .7rem;border-radius:999px;background:#2a3b55;font-size:.85rem;opacity:.6}
+.step.active{opacity:1;background:#345073}
+.card-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:.6rem}
+.card{background:#22344e;border:1px solid #2e4670;border-radius:12px;padding:.7rem}
+.card h4{margin:.2rem 0 .3rem;font-size:1rem}
+.card p{margin:0 0 .4rem;color:#cfd8e3;font-size:.9rem}
+.input{display:flex;flex-direction:column;gap:.25rem;margin:.35rem 0}
+.input input,.input select,.input textarea{border-radius:10px;border:none;padding:.55rem}
+.actions{display:flex;gap:.5rem;justify-content:flex-end;margin-top:.8rem}
+.preview-box{background:#0f1b2d;border:1px solid #2a3f63;border-radius:12px;padding:.6rem;max-height:200px;overflow:auto}
+.small{font-size:.9rem;color:#cbd5e1}
+#bgUpload{position:fixed;bottom:10px;right:10px;opacity:.15;cursor:pointer;z-index:50}
+#bgUpload:hover{opacity:.6}
+#toast{position:fixed;top:18px;left:50%;transform:translateX(-50%);background:#111;padding:1rem 1.2rem;border-radius:12px;font-weight:800;display:none;z-index:200;box-shadow:0 10px 24px rgba(0,0,0,.45);letter-spacing:.2px}
+.toast-success{background:#059669;color:#fff}
+.toast-info{background:#0078B7;color:#fff}
+.toast-warn{background:#c07900;color:#fff}
+.toast-error{background:#dc2626;color:#fff}
+.badges{display:flex;gap:.35rem;flex-wrap:wrap;justify-content:center}
+.badge-pop{animation:pop .6s}
+@keyframes pop{0%{transform:scale(.6);opacity:0}100%{transform:scale(1);opacity:1}}
+</style>
+</head>
+<body>
+<section class="hero" id="home">
+  <div class="spark"></div>
+  <div class="card">
+    <div class="title">ولا كلمة عالسريع</div>
+    <div class="hero-grid">
+      <div class="panel">
+        <div class="actions">
+          <button id="startBtn" class="btn-lg">بلش القيم</button>
+          <button id="setupBtn" class="btn-ghost">إعداد اللعبة</button>
+          <button id="previewBtn" class="btn-ghost">عرض الكلمات</button>
+          <button id="muteBtn" class="btn-ghost">🔊 كتم/تشغيل</button>
+        </div>
+        <div class="stat" id="homeStats"></div>
+      </div>
+    </div>
+  </div>
+</section>
+<div id="gameArea">
+  <div class="row">
+    <div id="turn" class="badge">الدور</div>
+    <div id="modeBadge" class="badge">وضع: أفراد</div>
+  </div>
+  <div class="row">
+    <div id="progress"></div>
+    <div id="timer"></div>
+  </div>
+  <div id="qr"></div>
+  <div id="hint"></div>
+  <div id="answer"></div>
+  <div id="scoreboard"></div>
+  <div id="playRow" class="controls-inline">
+    <button id="revealBtn">كشف الإجابة</button>
+    <button id="hintBtn">تلميح</button>
+  </div>
+  <div id="actionRow" style="display:none" class="controls-inline">
+    <button id="correctBtn" class="btn-correct">صحيح ✓</button>
+    <button id="wrongBtn" class="btn-wrong">خطأ ✗</button>
+    <button id="skipBtn" class="btn-skip">تخطِّ الكلمة</button>
+  </div>
+  <div class="game-footer">
+    <button id="endGameInPlay" class="btn-end">إنهاء اللعبة والعودة</button>
+  </div>
+  <div class="badges" id="achievements"></div>
+</div>
+<div class="modal" id="setupModal">
+  <div class="sheet">
+    <button id="closeSetup" class="close" aria-label="إغلاق">×</button>
+    <div class="stepbar">
+      <div class="step" id="s1">1) الوضع واللاعبون</div>
+      <div class="step" id="s2">2) مصدر الكلمات</div>
+      <div class="step" id="s3">3) المراجعة</div>
+    </div>
+    <div id="step1">
+      <div class="card-grid">
+        <div class="card">
+          <h4>اختر الوضع</h4>
+          <div class="input">
+            <label><input type="radio" name="mode" value="individual" checked> أفراد</label>
+            <label><input type="radio" name="mode" value="team"> فرق</label>
+          </div>
+          <div class="input" id="individualInputs">
+            <label>عدد اللاعبين</label>
+            <input type="number" id="playersCount" min="1" value="3">
+          </div>
+          <div class="input" id="teamInputs" style="display:none;">
+            <label>عدد الفرق</label>
+            <input type="number" id="teamsCount" min="2" value="2">
+          </div>
+        </div>
+        <div class="card">
+          <h4>خيارات الصوت</h4>
+          <div class="input"><label><input type="checkbox" id="muteOnStart"> كتم الصوت عند البدء</label></div>
+          <p class="small">يمكنك دائماً تغييره من زر الكتم.</p>
+        </div>
+      </div>
+      <div class="actions">
+        <button id="toStep2">التالي</button>
+      </div>
+    </div>
+    <div id="step2" style="display:none;">
+      <div class="card-grid">
+        <div class="card">
+          <h4>لصق/تحرير قائمة</h4>
+          <div class="input"><textarea id="pasteArea" placeholder="الصق هنا (سطر لكل كلمة)"></textarea></div>
+          <div class="actions">
+            <button id="saveDirect">حفظ مباشرة</button>
+            <button id="saveWithGemini">تنظيف بـ Gemini ثم حفظ</button>
+          </div>
+        </div>
+        <div class="card">
+          <h4>توليد بقائمة Gemini</h4>
+          <div class="input"><label>مفتاح Gemini Flash API</label><input type="password" id="geminiKeyInput" placeholder="أدخل المفتاح"></div>
+          <div class="input"><label>عن ماذا تريد الكلمات؟</label><input type="text" id="geminiTopic" placeholder="مثال: سفر، مسلسلات كويتية، طبيعة..."></div>
+          <div class="input"><label>عدد الكلمات</label><input type="number" id="geminiCount" min="5" max="50" value="20"></div>
+          <div class="actions"><button id="generateGemini">توليد ومعاينة</button></div>
+          <div class="preview-box" id="geminiPreview" style="display:none"></div>
+          <div class="actions" id="geminiAcceptRow" style="display:none"><button id="acceptGemini">اعتماد القائمة</button></div>
+        </div>
+      </div>
+      <div class="actions">
+        <button id="backTo1">السابق</button>
+        <button id="toStep3">التالي</button>
+      </div>
+    </div>
+    <div id="step3" style="display:none;">
+      <div class="card-grid">
+        <div class="card">
+          <h4>المراجعة النهائية</h4>
+          <p id="summary"></p>
+          <div class="preview-box" id="finalPreview"></div>
+        </div>
+      </div>
+      <div class="actions">
+        <button id="backTo2">السابق</button>
+        <button id="confirmSetup">اعتماد والبدء</button>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="modal" id="previewModal">
+  <div class="sheet">
+    <h3>معاينة كلمات اللعبة</h3>
+    <div class="preview-box" id="previewList"></div>
+    <div class="actions"><button id="closePreview">إغلاق</button></div>
+  </div>
+</div>
+<input type="file" accept="image/*" id="bgUpload" title="رفع خلفية" />
+<div id="toast"></div>
+<audio id="bgm" src="https://archive.org/download/arabic-8-bit/arabic-8bit.mp3" loop></audio>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js"></script>
+<script>
+const bgm=document.getElementById('bgm');bgm.volume=0.15;
+const STATE_KEY='boabed_game_state_v5';
+let words=[],defaultWords=['سيارة','ثلج','مطار','مفاجأة','قهوة','موسيقى','سفرة','روسيا','قطار','دب قطبي','كوب شاي','حديقة','فندق','متحف','كرة قدم','جسر','قمر','شمس','مطر','مسرح'],scores=[],teamScores=[],playerCount=0,teamCount=0,currentPlayer=0,currentWordIndex=0,geminiKey='',usedWordsCount=0,timerInterval=null,remainingSecs=0,mode='individual',streak=[],hintUsed=false,stage='playing';
+const $=s=>document.querySelector(s);
+function utf8Encode(str){return unescape(encodeURIComponent(str));}
+function renderQR(text){const qrBox=$('#qr');qrBox.innerHTML='';const qr=qrcode(0,'L');qr.addData(utf8Encode(text),'Byte');qr.make();qrBox.innerHTML=qr.createImgTag(6,0);}
+function cleanLines(text){return text.split(/\r?\n/).map(l=>l.trim()).filter(l=>l&&(/[\u0621-\u064A]{2,}/).test(l)).map(l=>l.replace(/\(.*?\)/g,'').replace(/^[-–•\s]+/,'').trim());}
+function show(el){el.style.display='';}
+function hide(el){el.style.display='none';}
+function toast(msg,type='info'){const t=$('#toast');t.className='';t.classList.add('toast-'+(type==='success'?'success':type==='warn'?'warn':type==='error'?'error':'info'));t.textContent=msg;t.style.display='block';setTimeout(()=>t.style.display='none',2200);}
+function saveState(){const state={words,mode,playerCount,teamCount,scores,teamScores,currentPlayer,currentWordIndex,usedWordsCount,remainingSecs,hintUsed,stage,homeHidden:$('#home').style.display==='none',gameVisible:$('#gameArea').style.display==='flex'};localStorage.setItem(STATE_KEY,JSON.stringify(state));}
+function loadState(){const s=localStorage.getItem(STATE_KEY);if(!s)return false;try{const st=JSON.parse(s);if(!st.words)return false;words=st.words;mode=st.mode||'individual';playerCount=st.playerCount||0;teamCount=st.teamCount||0;scores=st.scores||[];teamScores=st.teamScores||[];currentPlayer=st.currentPlayer||0;currentWordIndex=st.currentWordIndex||0;usedWordsCount=st.usedWordsCount||0;remainingSecs=st.remainingSecs||180;hintUsed=!!st.hintUsed;stage=st.stage||'playing';if(st.homeHidden)$('#home').style.display='none';if(st.gameVisible){$('#gameArea').style.display='flex';buildScoreboard();restoreTurn();}updateHomeStats();return true;}catch(e){return false}}
+window.addEventListener('beforeunload',saveState);
+if(localStorage.getItem('bgImageData')){document.body.style.backgroundImage=`url('${localStorage.getItem('bgImageData')}')`}
+$('#bgUpload').addEventListener('change',e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=ev=>{const data=ev.target.result;document.body.style.backgroundImage=`url('${data}')`;localStorage.setItem('bgImageData',data)};r.readAsDataURL(f)});
+const previewModal=$('#previewModal');
+function openPreview(list){$('#previewList').innerHTML='<ol>'+list.map(w=>`<li>${w}</li>`).join('')+'</ol>';previewModal.classList.add('active')}
+$('#previewBtn').onclick=()=>{if(words.length===0){toast('لا توجد كلمات للعرض','warn');return}openPreview(words)}
+$('#closePreview').onclick=()=>previewModal.classList.remove('active')
+const setupModal=$('#setupModal');
+const closeSetup=document.getElementById('closeSetup');
+if(closeSetup){closeSetup.onclick=()=>setupModal.classList.remove('active');}
+$('#setupBtn').onclick=()=>{updateCurrentCount();setStep(1);setupModal.classList.add('active')}
+function setStep(n){['s1','s2','s3'].forEach((id,i)=>{$('#'+id).classList.toggle('active',i===n-1)});['step1','step2','step3'].forEach((id,i)=>{$('#'+id).style.display=(i===n-1)?'block':'none'})}
+Array.from(document.querySelectorAll('input[name="mode"]')).forEach(r=>r.onchange=()=>{mode=r.value;$('#modeBadge').textContent='وضع: '+(mode==='individual'?'أفراد':'فرق');$('#individualInputs').style.display=(mode==='individual')?'block':'none';$('#teamInputs').style.display=(mode==='team')?'block':'none';});
+$('#toStep2').onclick=()=>setStep(2);
+$('#backTo1').onclick=()=>setStep(1);
+$('#toStep3').onclick=()=>{if(words.length===0){toast('اختر/أدخل قائمة أولاً','warn');return}buildSummary();setStep(3)};
+$('#backTo2').onclick=()=>setStep(2);
+function updateCurrentCount(){const el=document.getElementById('currentCount');if(el)el.textContent=words.length}
+function saveDirect(){const cleaned=cleanLines($('#pasteArea').value);if(cleaned.length===0){toast('القائمة فارغة أو غير صالحة','warn');return}words=cleaned;updateCurrentCount();toast('تم الحفظ مباشرة','success');saveState()}
+$('#saveDirect').onclick=saveDirect;
+async function generateWithGemini(){const key=$('#geminiKeyInput').value.trim();if(!key){toast('أدخل مفتاح Gemini','error');return}geminiKey=key;const topic=$('#geminiTopic').value.trim()||'مواضيع متنوعة';const num=parseInt($('#geminiCount').value)||20;try{const promptText=`أنشئ قائمة من ${num} كلمة عربية مناسبة للعبة تمثيل صامت (Pictionary) حول الموضوع: "${topic}". اجعل الكلمات متنوعة وسهلة الفهم، كلمة أو عبارتين كحد أقصى لكل سطر. أعدها كسطور بدون أرقام أو علامات.`;const res=await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key='+geminiKey,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({contents:[{parts:[{text:promptText}]}]})});const data=await res.json();const text=data.candidates?.[0]?.content?.parts?.[0]?.text||'';const preview=cleanLines(text);if(preview.length===0){toast('لم يتم الحصول على كلمات','error');return}const box=$('#geminiPreview');box.style.display='block';box.innerHTML='<ol>'+preview.map(w=>`<li>${w}</li>`).join('')+'</ol>';document.getElementById('geminiAcceptRow').style.display='flex';box.dataset.tmp=JSON.stringify(preview);}catch(e){toast('خطأ في الاتصال بـ Gemini','error')}}
+$('#generateGemini').onclick=generateWithGemini;
+$('#acceptGemini').onclick=()=>{const box=$('#geminiPreview');if(!box.dataset.tmp){toast('لا توجد معاينة','warn');return}words=JSON.parse(box.dataset.tmp);updateCurrentCount();toast('تم اعتماد قائمة Gemini','success');saveState()}
+async function saveWithGemini(){const raw=$('#pasteArea').value.trim();if(!raw){toast('القائمة فارغة','warn');return}const key=$('#geminiKeyInput').value.trim();if(!key){toast('أدخل مفتاح Gemini','error');return}geminiKey=key;try{const promptText=`نظّف القائمة التالية من الرموز والرؤوس والتكرارات، وأعد كل عنصر في سطر مستقل بدون ترقيم أو أقواس:\n\n${raw}`;const res=await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key='+geminiKey,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({contents:[{parts:[{text:promptText}]}]})});const data=await res.json();const text=data.candidates?.[0]?.content?.parts?.[0]?.text||'';const cleaned=cleanLines(text);if(cleaned.length===0){toast('لم يتم الحصول على كلمات صالحة','error');return}words=cleaned;updateCurrentCount();toast('تم التنظيف والحفظ','success');saveState()}catch(e){toast('خطأ في الاتصال بـ Gemini','error')}}
+$('#saveWithGemini').onclick=saveWithGemini;
+function buildSummary(){$('#summary').innerHTML=`<b>الوضع:</b> ${(mode==='individual')?'أفراد':'فرق'} · <b>الكلمات:</b> ${words.length}`;$('#finalPreview').innerHTML='<ol>'+words.map(w=>`<li>${w}</li>`).join('')+'</ol>'}
+$('#confirmSetup').onclick=()=>{if(mode==='individual'){playerCount=parseInt($('#playersCount').value)||1;scores=new Array(playerCount).fill(0);streak=new Array(playerCount).fill(0)}else{teamCount=parseInt($('#teamsCount').value)||2;playerCount=teamCount;teamScores=new Array(playerCount).fill(0);streak=new Array(playerCount).fill(0)};setupModal.classList.remove('active');toast('الإعداد جاهز — اضغط «بلش القيم»','success');if($('#muteOnStart').checked){bgm.pause()}else{bgm.play()}saveState()}
+function updateHomeStats(){$('#homeStats').innerHTML=words.length?`<span class="badge">قائمة حالية: ${words.length} كلمة</span>`:''}
+function buildScoreboard(){const sb=$('#scoreboard');sb.innerHTML='';const arr=(mode==='individual')?scores:teamScores;arr.forEach((s,i)=>{const div=document.createElement('div');div.className='player';div.dataset.idx=i;div.innerHTML=`${(mode==='individual')?'اللاعب':'الفريق'} ${i+1}: <span>${(+s).toFixed(1)}</span>`;sb.appendChild(div)});highlightActive()}
+function updateScore(idx){const span=document.querySelector(`.player[data-idx="${idx}"] span`);if(span){const arr=(mode==='individual')?scores:teamScores;span.textContent=(+arr[idx]).toFixed(1)}}
+function highlightActive(){document.querySelectorAll('.player').forEach(p=>p.classList.remove('active'));const el=document.querySelector(`.player[data-idx="${currentPlayer}"]`);if(el)el.classList.add('active')}
+function goHome(){$('#gameArea').style.display='none';$('#home').style.display='block';bgm.pause();stage='ended';saveState();updateHomeStats()}
+function startGame(){if(words.length===0){if(confirm('لا توجد قائمة كلمات. سنستخدم القائمة الافتراضية. موافق؟')){words=[...defaultWords];updateHomeStats()}else{toast('أدخل/ولّد قائمة أولاً من إعداد اللعبة','warn');return}}if(mode==='individual'&&playerCount<=0){playerCount=3;scores=new Array(playerCount).fill(0);streak=new Array(playerCount).fill(0)}if(mode==='team'&&playerCount<=0){playerCount=2;teamScores=new Array(playerCount).fill(0);streak=new Array(playerCount).fill(0)}$('#home').style.display='none';$('#gameArea').style.display='flex';currentPlayer=0;currentWordIndex=0;usedWordsCount=0;stage='playing';buildScoreboard();showTurn();saveState()}
+function updateProgress(){$('#progress').textContent=`كلمة ${usedWordsCount+1} من ${words.length}`}
+function startTimer(secs=180){clearInterval(timerInterval);remainingSecs=secs;tickTimer();timerInterval=setInterval(()=>{remainingSecs--;if(remainingSecs<=15)$('#timer').classList.add('low');else $('#timer').classList.remove('low');tickTimer();if(remainingSecs<=0){clearInterval(timerInterval);reveal()}saveState()},1000)}
+function tickTimer(){const m=Math.floor(remainingSecs/60).toString().padStart(2,'0');const s=(remainingSecs%60).toString().padStart(2,'0');$('#timer').textContent=`${m}:${s}`}
+function showTurn(){$('#answer').style.display='none';$('#hint').textContent='';hintUsed=false;$('#playRow').style.display='flex';$('#actionRow').style.display='none';$('#turn').textContent=`دور ${(mode==='individual')?'اللاعب':'الفريق'} ${currentPlayer+1}`;updateProgress();const special=((usedWordsCount+1)%5===0);$('#qr').classList.toggle('special',special);renderQR(words[currentWordIndex]);startTimer(180);highlightActive();stage='playing';saveState()}
+function reveal(){$('#answer').textContent=words[currentWordIndex];$('#answer').style.display='block';$('#playRow').style.display='none';$('#actionRow').style.display='flex';$('#qr').innerHTML='<img src="https://media.giphy.com/media/du3J3cXyzhj75IOgvA/giphy.gif" style="width:256px;height:256px;border-radius:12px">';clearInterval(timerInterval);stage='revealed';saveState()}
+function calcPoints(){if(hintUsed)return 0.5;let pts=1.0;if(remainingSecs>120)pts+=0.5;else if(remainingSecs>60)pts+=0.25;if(remainingSecs>150)pts+=0.5;return Math.max(0.1,Math.round(pts*10)/10)}
+function checkAchievements(points){const arr=(mode==='individual')?scores:teamScores;const s=arr[currentPlayer];if(points>=1.5)pushBadge('⚡ مكافأة سرعة');if(s>=10)pushBadge('💯 وصلت 10 نقاط')}
+function pushBadge(html){const box=$('#achievements');const el=document.createElement('div');el.className='badge badge-pop';el.innerHTML=html;box.appendChild(el);setTimeout(()=>el.remove(),3000)}
+function judge(correct){if(correct){const earned=calcPoints();if(mode==='individual'){scores[currentPlayer]+=earned}else{teamScores[currentPlayer]+=earned}updateScore(currentPlayer);toast(`${(mode==='individual')?'اللاعب':'الفريق'} ${currentPlayer+1} سجّل ${earned.toFixed(1)} نقطة!`,'success');checkAchievements(earned)}else{toast('إجابة خاطئة','warn')}next(true)}
+function next(advanceTurn){usedWordsCount++;if(usedWordsCount>=words.length){return endGame()}currentWordIndex=(currentWordIndex+1)%words.length;if(advanceTurn){currentPlayer=(currentPlayer+1)%playerCount}showTurn();saveState()}
+function skipWord(){usedWordsCount++;if(usedWordsCount>=words.length){return endGame()}currentWordIndex=(currentWordIndex+1)%words.length;showTurn();saveState()}
+function endGame(){$('#gameArea').style.display='none';const arr=(mode==='individual')?scores:teamScores;const max=Math.max(...arr);const winners=arr.map((s,i)=>s===max?`${(mode==='individual')?'اللاعب':'الفريق'} ${i+1}`:null).filter(Boolean).join(' و ');alert(`انتهت اللعبة! الفائز: ${winners} بـ ${max.toFixed(1)} نقاط`);goHome()}
+function restoreTurn(){$('#home').style.display='none';$('#gameArea').style.display='flex';buildScoreboard();$('#modeBadge').textContent='وضع: '+(mode==='individual'?'أفراد':'فرق');$('#turn').textContent=`دور ${(mode==='individual')?'اللاعب':'الفريق'} ${currentPlayer+1}`;updateProgress();highlightActive();if(stage==='revealed'){ $('#answer').textContent=words[currentWordIndex];$('#answer').style.display='block';$('#playRow').style.display='none';$('#actionRow').style.display='flex';$('#qr').innerHTML='<img src="https://media.giphy.com/media/du3J3cXyzhj75IOgvA/giphy.gif" style="width:256px;height:256px;border-radius:12px">';}else if(stage==='playing'){ $('#answer').style.display='none';$('#playRow').style.display='flex';$('#actionRow').style.display='none';renderQR(words[currentWordIndex]);startTimer(remainingSecs)}}
+function makeHint(word){const letters=word.replace(/[^\u0621-\u064A\s]/g,'');const n=Math.max(1,Math.ceil(letters.length*0.3));return word.slice(0,n)+'…'}
+$('#startBtn').onclick=startGame;
+$('#revealBtn').onclick=()=>reveal();
+$('#correctBtn').onclick=()=>judge(true);
+$('#wrongBtn').onclick=()=>judge(false);
+$('#skipBtn').onclick=skipWord;
+$('#endGameInPlay').onclick=()=>{if(confirm('هل تريد إنهاء الجولة والعودة للصفحة الرئيسية؟'))goHome()};
+$('#hintBtn').onclick=()=>{if(!hintUsed){$('#hint').textContent='تلميح: '+makeHint(words[currentWordIndex]);hintUsed=true;toast('تم استخدام تلميح (الحد الأقصى 0.5 نقطة)','warn');saveState()}};
+window._muted=false;$('#muteBtn').onclick=()=>{window._muted=!window._muted;if(window._muted){bgm.pause();toast('تم كتم الأصوات','info')}else{bgm.play();toast('تشغيل الأصوات','info')}};
+window.addEventListener('DOMContentLoaded',()=>{loadState();updateHomeStats()});
+</script>
+</body>
+</html>
