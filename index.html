@@ -478,7 +478,14 @@ button:active{transform:translateY(0) scale(.98)}
       <div class="card-grid">
         <div class="card">
           <h4 data-ar="لصق/تحرير قائمة" data-en="Paste/Edit List">لصق/تحرير قائمة</h4>
-          <div class="input"><textarea id="pasteArea" data-ar="الصق هنا (سطر لكل كلمة)" data-en="Paste here (one word per line)">الصق هنا (سطر لكل كلمة)</textarea></div>
+
+<div class="input">
+  <textarea id="pasteArea" 
+            placeholder="الصق هنا (سطر لكل كلمة)" 
+            data-ar="الصق هنا (سطر لكل كلمة)" 
+            data-en="Paste here (one word per line)">
+  </textarea>
+</div>
           <div class="actions">
             <button id="saveDirect" data-ar="حفظ مباشرة" data-en="Save Direct">حفظ مباشرة</button>
             <button id="saveWithGemini" data-ar="تنظيف بـ Gemini ثم حفظ" data-en="Clean with Gemini then Save">تنظيف بـ Gemini ثم حفظ</button>
