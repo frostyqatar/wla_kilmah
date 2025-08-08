@@ -65,7 +65,7 @@ button:active{transform:translateY(0) scale(.98)}
 
 @keyframes titlePulse {
   0% {
-    text-shadow: 
+    text-shadow:
       -2px -2px 0 #ffffff,
        2px -2px 0 #ffffff,
       -2px  2px 0 #ffffff,
@@ -75,7 +75,7 @@ button:active{transform:translateY(0) scale(.98)}
     transform: scale(1);
   }
   50% {
-    text-shadow: 
+    text-shadow:
       -2px -2px 0 #ffffff,
        2px -2px 0 #ffffff,
       -2px  2px 0 #ffffff,
@@ -85,7 +85,7 @@ button:active{transform:translateY(0) scale(.98)}
     transform: scale(1.03);
   }
   100% {
-    text-shadow: 
+    text-shadow:
       -2px -2px 0 #ffffff,
        2px -2px 0 #ffffff,
       -2px  2px 0 #ffffff,
@@ -108,9 +108,37 @@ button:active{transform:translateY(0) scale(.98)}
 
 #gameArea{display:none;flex-direction:column;align-items:center;gap:1rem;background:rgba(6,24,38,.8);padding:1.5rem;border-radius:16px;backdrop-filter:blur(8px);width:min(92vw,560px);margin:2rem auto;border:2px solid var(--primary)}
 .row{display:flex;gap:.6rem;align-items:center;justify-content:center;flex-wrap:wrap}
-#qr{width:min(280px, 80vw);height:min(280px, 80vw);background:#fff;padding:.6rem;border-radius:16px;display:flex;align-items:center;justify-content:center;box-shadow:0 0 0 0 rgba(96,125,126,.6);transition:all .3s ease;border:3px solid var(--primary)}
+#qr{position:relative;width:min(280px, 80vw);height:min(280px, 80vw);background:#fff;padding:.6rem;border-radius:16px;display:flex;align-items:center;justify-content:center;box-shadow:0 0 0 0 rgba(96,125,126,.6);transition:all .3s ease;border:3px solid var(--primary);overflow:hidden}
 #qr.special{box-shadow:0 0 0 8px rgba(96,125,126,.4),0 0 30px 8px rgba(96,125,126,.4);animation:specialPulse 2s infinite}
 @keyframes specialPulse{0%{transform:scale(1)}50%{transform:scale(1.05)}100%{transform:scale(1)}}
+
+/* Scan effect */
+#qr.scan-phase::before{
+  content:'';
+  position:absolute;
+  left:0; right:0;
+  height:40%;
+  top:-40%;
+  background:linear-gradient(to bottom, rgba(59,130,246,0) 0%, rgba(59,130,246,.25) 50%, rgba(59,130,246,0) 100%);
+  animation:scanSweep 2s linear infinite;
+  pointer-events:none;
+}
+#qr.scan-phase::after{
+  content:attr(data-scan-label);
+  position:absolute;
+  bottom:8px; left:50%;
+  transform:translateX(-50%);
+  background:rgba(26,48,63,.92);
+  border:1px solid var(--primary);
+  color:#fff;
+  padding:.3rem .6rem;
+  border-radius:999px;
+  font-weight:700;
+  text-shadow:0 0 8px var(--info);
+  pointer-events:none;
+}
+@keyframes scanSweep{0%{top:-40%}100%{top:140%}}
+
 #answer{font-size:1.8rem;font-weight:700;display:none;padding:1rem;background:var(--secondary);border-radius:12px;border:2px solid var(--primary);text-align:center}
 #hint{font-size:2.0rem;color:#ffffff;min-height:1.2rem;text-align:center;font-weight:600}
 #scoreboard{display:flex;gap:.6rem;flex-wrap:wrap;justify-content:center}
@@ -140,10 +168,41 @@ button:active{transform:translateY(0) scale(.98)}
 
 #progress,#timer{font-size:1rem;background:var(--secondary);padding:.5rem .8rem;border-radius:10px;border:1px solid var(--primary);font-weight:600}
 #timer.low{animation:blink 1s infinite;background:var(--error);border-color:var(--error)}
+#timer.scan{background:var(--info);border-color:var(--info)}
+#timer.paused{background:#6b7280;border-color:#6b7280}
 @keyframes blink{50%{filter:brightness(1.4)}}
 .controls-inline{display:flex;gap:.6rem;flex-wrap:wrap;justify-content:center}
 .game-footer{display:flex;gap:.8rem;justify-content:center;margin-top:.6rem}
 
+/* Hint menu */
+.hint-menu{
+  position:absolute;
+  background:var(--secondary);
+  border:2px solid var(--primary);
+  border-radius:10px;
+  padding:.4rem;
+  display:none;
+  z-index:150;
+  min-width:200px;
+  box-shadow:0 12px 24px rgba(0,0,0,.4);
+}
+.hint-menu.active{display:block}
+.hint-menu .hint-title{
+  font-weight:700;
+  padding:.4rem .6rem .2rem;
+  color:#e2e8f0;
+  opacity:.9;
+}
+.hint-menu button{
+  display:block;width:100%;
+  text-align:start;
+  background:transparent;
+  border:none;color:#fff;
+  padding:.5rem .6rem;border-radius:8px;
+}
+.hint-menu button:hover{background:var(--primary)}
+
+/* Modals + Toasts (unchanged) */
 .modal{position:fixed;inset:0;background:rgba(6,24,38,.85);display:none;align-items:center;justify-content:center;z-index:120;backdrop-filter:blur(4px);padding:1rem}
 .modal.active{display:flex}
 .modal .sheet{background:var(--secondary);border:2px solid var(--primary);border-radius:16px;width:min(96vw,760px);max-width:90vw;max-height:90vh;overflow-y:auto;padding:1.5rem;position:relative;box-shadow:0 20px 40px rgba(6,24,38,.8)}
@@ -188,266 +247,72 @@ button:active{transform:translateY(0) scale(.98)}
 
 /* Enhanced Mobile Responsive Design */
 @media (max-width: 768px) {
-  .hero {
-    min-height: 100vh;
-    padding: 1rem;
-    justify-content: flex-start;
-    padding-top: 2rem;
-  }
-  
-  .hero .card {
-    padding: 1.5rem;
-    width: 95vw;
-    max-width: none;
-    margin: 0;
-  }
-  
-  .hero .panel {
-    min-height: auto;
-    padding: 1.2rem;
-  }
-  
-  .title {
-    font-size: clamp(1.8rem, 7vw, 2.5rem);
-    margin: 0.2rem 0 0.8rem;
-    line-height: 1.1;
-  }
-  
-  .hero .actions {
-    gap: 0.6rem;
-    flex-direction: column;
-    align-items: stretch;
-  }
-  
-  .hero .actions button {
-    width: 100%;
-    padding: 1rem;
-    font-size: 1rem;
-    min-height: 50px;
-  }
-  
-  button {
-    padding: 0.8rem 1rem;
-    font-size: 0.9rem;
-    min-height: 44px;
-  }
-  
-  .btn-lg {
-    font-size: 1rem;
-    padding: 1rem 1.2rem;
-    min-height: 52px;
-  }
-  
-  #gameArea {
-    width: 95vw;
-    padding: 1rem;
-    margin: 1rem auto;
-  }
-  
-  #qr {
-    width: min(250px, 75vw);
-    height: min(250px, 75vw);
-  }
-  
-  #answer {
-    font-size: 1.4rem;
-    padding: 0.8rem;
-  }
-  
-  .modal .sheet {
-    width: 95vw;
-    padding: 1rem;
-    max-height: 85vh;
-  }
-  
-  .card-grid {
-    grid-template-columns: 1fr;
-  }
-  
-  .stepbar {
-    flex-direction: column;
-    gap: 0.3rem;
-  }
-  
-  .step {
-    text-align: center;
-    font-size: 0.8rem;
-  }
-  
-  .actions {
-    justify-content: center;
-  }
-  
-  .controls-inline {
-    gap: 0.4rem;
-    flex-direction: column;
-    align-items: stretch;
-  }
-  
-  .controls-inline button {
-    width: 100%;
-    min-height: 48px;
-  }
-  
-  .player {
-    font-size: 0.9rem;
-    padding: 0.5rem 0.8rem;
-  }
-  
-  .winner-title {
-    font-size: 1.8rem;
-  }
-  
-  .winner-name {
-    font-size: 1.4rem;
-  }
-  
-  .lang-toggle {
-    top: 10px;
-    right: 10px;
-    padding: 0.4rem 0.8rem;
-    font-size: 0.8rem;
-  }
+  .hero { min-height: 100vh; padding: 1rem; justify-content: flex-start; padding-top: 2rem; }
+  .hero .card { padding: 1.5rem; width: 95vw; max-width: none; margin: 0; }
+  .hero .panel { min-height: auto; padding: 1.2rem; }
+  .title { font-size: clamp(1.8rem, 7vw, 2.5rem); margin: 0.2rem 0 0.8rem; line-height: 1.1; }
+  .hero .actions { gap: 0.6rem; flex-direction: column; align-items: stretch; }
+  .hero .actions button { width: 100%; padding: 1rem; font-size: 1rem; min-height: 50px; }
+  button { padding: 0.8rem 1rem; font-size: 0.9rem; min-height: 44px; }
+  .btn-lg { font-size: 1rem; padding: 1rem 1.2rem; min-height: 52px; }
+  #gameArea { width: 95vw; padding: 1rem; margin: 1rem auto; }
+  #qr { width: min(250px, 75vw); height: min(250px, 75vw); }
+  #answer { font-size: 1.4rem; padding: 0.8rem; }
+  .modal .sheet { width: 95vw; padding: 1rem; max-height: 85vh; }
+  .card-grid { grid-template-columns: 1fr; }
+  .stepbar { flex-direction: column; gap: 0.3rem; }
+  .step { text-align: center; font-size: 0.8rem; }
+  .actions { justify-content: center; }
+  .controls-inline { gap: 0.4rem; flex-direction: column; align-items: stretch; }
+  .controls-inline button { width: 100%; min-height: 48px; }
+  .player { font-size: 0.9rem; padding: 0.5rem 0.8rem; }
+  .winner-title { font-size: 1.8rem; }
+  .winner-name { font-size: 1.4rem; }
+  .lang-toggle { top: 10px; right: 10px; padding: 0.4rem 0.8rem; font-size: 0.8rem; }
 }
 
 @media (max-width: 480px) {
-  .hero {
-    padding: 0.5rem;
-    padding-top: 1.5rem;
-  }
-  
-  .hero .card {
-    padding: 1rem;
-    border-radius: 16px;
-  }
-  
-  .hero .panel {
-    padding: 1rem;
-  }
-  
-  .title {
-    font-size: clamp(1.5rem, 6vw, 2rem);
-    margin: 0.1rem 0 0.6rem;
-  }
-  
-  .hero .actions button {
-    padding: 0.9rem;
-    font-size: 0.95rem;
-  }
-  
-  button {
-    padding: 0.7rem 0.9rem;
-    font-size: 0.85rem;
-  }
-  
-  #qr {
-    width: min(220px, 70vw);
-    height: min(220px, 70vw);
-  }
-  
-  #answer {
-    font-size: 1.2rem;
-  }
-  
-  .modal .sheet {
-    padding: 0.8rem;
-  }
-  
-  .card {
-    padding: 0.8rem;
-  }
-  
-  .input input, .input select, .input textarea {
-    padding: 0.6rem;
-  }
-  
-  .lang-toggle {
-    top: 8px;
-    right: 8px;
-    padding: 0.3rem 0.6rem;
-    font-size: 0.75rem;
-  }
+  .hero { padding: 0.5rem; padding-top: 1.5rem; }
+  .hero .card { padding: 1rem; border-radius: 16px; }
+  .hero .panel { padding: 1rem; }
+  .title { font-size: clamp(1.5rem, 6vw, 2rem); margin: 0.1rem 0 0.6rem; }
+  .hero .actions button { padding: 0.9rem; font-size: 0.95rem; }
+  button { padding: 0.7rem 0.9rem; font-size: 0.85rem; }
+  #qr { width: min(220px, 70vw); height: min(220px, 70vw); }
+  #answer { font-size: 1.2rem; }
+  .modal .sheet { padding: 0.8rem; }
+  .card { padding: 0.8rem; }
+  .input input, .input select, .input textarea { padding: 0.6rem; }
+  .lang-toggle { top: 8px; right: 8px; padding: 0.3rem 0.6rem; font-size: 0.75rem; }
 }
 
 @media (max-width: 390px) {
-  .hero {
-    padding: 0.3rem;
-    padding-top: 1rem;
-  }
-  
-  .hero .card {
-    padding: 0.8rem;
-    width: 98vw;
-  }
-  
-  .hero .panel {
-    padding: 0.8rem;
-  }
-  
-  .title {
-    font-size: clamp(1.3rem, 5vw, 1.8rem);
-    margin: 0 0 0.5rem;
-  }
-  
-  .hero .actions {
-    gap: 0.4rem;
-  }
-  
-  .hero .actions button {
-    padding: 0.8rem;
-    font-size: 0.9rem;
-    min-height: 46px;
-  }
-  
-  .controls-inline button {
-    min-height: 46px;
-    font-size: 0.85rem;
-  }
-  
-  .lang-toggle {
-    top: 5px;
-    right: 5px;
-    padding: 0.25rem 0.5rem;
-    font-size: 0.7rem;
-  }
+  .hero { padding: 0.3rem; padding-top: 1rem; }
+  .hero .card { padding: 0.8rem; width: 98vw; }
+  .hero .panel { padding: 0.8rem; }
+  .title { font-size: clamp(1.3rem, 5vw, 1.8rem); margin: 0 0 0.5rem; }
+  .hero .actions { gap: 0.4rem; }
+  .hero .actions button { padding: 0.8rem; font-size: 0.9rem; min-height: 46px; }
+  .controls-inline button { min-height: 46px; font-size: 0.85rem; }
+  .lang-toggle { top: 5px; right: 5px; padding: 0.25rem 0.5rem; font-size: 0.7rem; }
 }
 
 @media (orientation: portrait) and (max-height: 700px) {
-  .hero {
-    min-height: 100vh;
-    justify-content: center;
-  }
-  
-  .hero .card {
-    max-height: 90vh;
-    overflow-y: auto;
-  }
+  .hero { min-height: 100vh; justify-content: center; }
+  .hero .card { max-height: 90vh; overflow-y: auto; }
 }
 
 /* Tablet Landscape */
 @media (min-width: 769px) and (max-width: 1024px) {
-  .hero .card {
-    width: 85vw;
-  }
-  
-  #gameArea {
-    width: 85vw;
-  }
-  
-  .modal .sheet {
-    width: 85vw;
-  }
+  .hero .card { width: 85vw; }
+  #gameArea { width: 85vw; }
+  .modal .sheet { width: 85vw; }
 }
 
 /* Large screens */
 @media (min-width: 1200px) {
-  .title {
-    font-size: 4.2rem;
-  }
-  
-  .hero .card {
-    max-width: 800px;
-  }
+  .title { font-size: 4.2rem; }
+  .hero .card { max-width: 800px; }
 }
 </style>
 </head>
@@ -461,7 +326,6 @@ button:active{transform:translateY(0) scale(.98)}
     <div class="hero-grid">
       <div class="panel">
         <div class="actions">
-          
           <button id="setupBtn" class="btn-ghost" data-ar="إعداد اللعبة" data-en="Game Setup">إعداد اللعبة</button>
           <button id="startBtn" class="btn-lg" data-ar="بلش القيم" data-en="Start Game">بلش القيم</button>
           <button id="previewBtn" class="btn-ghost" data-ar="عرض الكلمات" data-en="Preview Words">عرض الكلمات</button>
@@ -479,7 +343,10 @@ button:active{transform:translateY(0) scale(.98)}
   </div>
   <div class="row">
     <div id="progress"></div>
-    <div id="timer"></div>
+    <div style="display:flex;gap:.5rem;align-items:center;">
+      <div id="timer"></div>
+      <button id="pauseBtn" class="btn-ghost" data-ar="إيقاف مؤقت" data-en="Pause">إيقاف مؤقت</button>
+    </div>
   </div>
   <div id="qr"></div>
   <div id="hint"></div>
@@ -507,11 +374,7 @@ button:active{transform:translateY(0) scale(.98)}
       <div class="celebration">🎉</div>
       <div class="winner-title" data-ar="انتهت اللعبة!" data-en="Game Over!">انتهت اللعبة!</div>
       <div class="winner-name" id="winnerName">الفائز</div>
-      
-      <div class="final-scores" id="finalScores">
-        <!-- Scores will be populated here -->
-      </div>
-      
+      <div class="final-scores" id="finalScores"></div>
       <div class="actions" style="justify-content:center;margin-top:2rem">
         <button id="playAgainBtn" class="btn-lg" data-ar="العب مرة أخرى" data-en="Play Again">العب مرة أخرى</button>
         <button id="backToHomeBtn" class="btn-ghost" data-ar="العودة للقائمة" data-en="Back to Menu">العودة للقائمة</button>
@@ -559,14 +422,12 @@ button:active{transform:translateY(0) scale(.98)}
       <div class="card-grid">
         <div class="card">
           <h4 data-ar="لصق/تحرير قائمة" data-en="Paste/Edit List">لصق/تحرير قائمة</h4>
-
-<div class="input">
-  <textarea id="pasteArea" 
-            placeholder="الصق هنا (سطر لكل كلمة)" 
-            data-ar="الصق هنا (سطر لكل كلمة)" 
-            data-en="Paste here (one word per line)">
-  </textarea>
-</div>
+          <div class="input">
+            <textarea id="pasteArea"
+              placeholder="الصق هنا (سطر لكل كلمة)"
+              data-ar="الصق هنا (سطر لكل كلمة)"
+              data-en="Paste here (one word per line)"></textarea>
+          </div>
           <div class="actions">
             <button id="saveDirect" data-ar="حفظ مباشرة" data-en="Save Direct">حفظ مباشرة</button>
             <button id="saveWithGemini" data-ar="تنظيف بـ Gemini ثم حفظ" data-en="Clean with Gemini then Save">تنظيف بـ Gemini ثم حفظ</button>
@@ -663,7 +524,17 @@ const translations = {
     'no_word_list': 'لا توجد قائمة كلمات. سنستخدم القائمة الافتراضية. موافق؟',
     'setup_first': 'أدخل/ولّد قائمة أولاً من إعداد اللعبة',
     'new_game_start': 'لعبة جديدة بدأت!',
-    'winner': 'الفائز'
+    'winner': 'الفائز',
+    'scan_qr': 'قم بمسح رمز QR',
+    'scan_free': '⏳ أول 20 ثانية مجانية للمسح',
+    'pause': 'إيقاف مؤقت',
+    'resume': 'استئناف',
+    'paused': 'متوقف مؤقتًا',
+    'scan': 'مسح',
+    'reveal_begin': 'كشف البداية',
+    'reveal_middle': 'كشف الوسط',
+    'reveal_end': 'كشف النهاية',
+    'choose_hint_part': 'اختر الجزء المراد كشفه'
   },
   en: {
     'player': 'Player',
@@ -700,7 +571,17 @@ const translations = {
     'no_word_list': 'No word list. We will use the default list. OK?',
     'setup_first': 'Enter/generate a list first from game setup',
     'new_game_start': 'New game started!',
-    'winner': 'Winner'
+    'winner': 'Winner',
+    'scan_qr': 'Scan the QR code',
+    'scan_free': 'First 20 seconds are free for scanning',
+    'pause': 'Pause',
+    'resume': 'Resume',
+    'paused': 'Paused',
+    'scan': 'Scan',
+    'reveal_begin': 'Reveal beginning',
+    'reveal_middle': 'Reveal middle',
+    'reveal_end': 'Reveal end',
+    'choose_hint_part': 'Choose which part to reveal'
   }
 };
 
@@ -723,14 +604,18 @@ function updateLanguage() {
       el.textContent = el.getAttribute(`data-${currentLang}`);
     }
   });
-  
+
   // Update HTML attributes
   document.documentElement.lang = currentLang;
   document.documentElement.dir = currentLang === 'ar' ? 'rtl' : 'ltr';
-  
+
   // Update language toggle button
   document.getElementById('langToggle').textContent = currentLang === 'ar' ? 'English' : 'العربية';
-  
+
+  // Update pause button text to reflect state
+  const pauseBtn = document.getElementById('pauseBtn');
+  if (pauseBtn) pauseBtn.textContent = translate(paused ? 'resume' : 'pause');
+
   // Update dynamic content
   updateHomeStats();
   if (document.getElementById('gameArea').style.display === 'flex') {
@@ -752,12 +637,35 @@ if (savedLang && savedLang !== currentLang) {
 }
 
 const bgm=document.getElementById('bgm');bgm.volume=0.15;
-const STATE_KEY='boabed_game_state_v6';
-let words=[],defaultWords=['سيارة','ثلج','مطار','مفاجأة','قهوة','موسيقى','سفرة','روسيا','قطار','دب قطبي','كوب شاي','حديقة','فندق','متحف','كرة قدم','جسر','قمر','شمس','مطر','مسرح'],scores=[],teamScores=[],playerCount=0,teamCount=0,currentPlayer=0,currentWordIndex=0,geminiKey='',usedWordsCount=0,timerInterval=null,remainingSecs=0,mode='individual',streak=[],hintUsed=false,stage='playing';
+
+// State v7 with scan phase and pause
+const STATE_KEY='boabed_game_state_v7';
+let words=[],defaultWords=['سيارة','ثلج','مطار','مفاجأة','قهوة','موسيقى','سفرة','روسيا','قطار','دب قطبي','كوب شاي','حديقة','فندق','متحف','كرة قدم','جسر','قمر','شمس','مطر','مسرح'],
+    scores=[],teamScores=[],playerCount=0,teamCount=0,currentPlayer=0,currentWordIndex=0,geminiKey='',
+    usedWordsCount=0,timerInterval=null,mode='individual',streak=[],hintUsed=false,stage='playing',
+    phase='scan',paused=false,remainingScanSecs=20,remainingPlaySecs=170;
+
 const $=s=>document.querySelector(s);
 function utf8Encode(str){return unescape(encodeURIComponent(str));}
 function renderQR(text){const qrBox=$('#qr');qrBox.innerHTML='';const qr=qrcode(0,'L');qr.addData(utf8Encode(text),'Byte');qr.make();qrBox.innerHTML=qr.createImgTag(6,0);}
-function cleanLines(text){const raw=text.split(/\r?\n/).map(x=>x.trim()).filter(Boolean);const out=[];const seen=new Set();for(let l of raw){l=l.replace(/^\s*\d+[)\-:\.]?\s*/,'');l=l.replace(/\[[^\]]*\]|\([^)]*\)|\{[^}]*\}/g,'');l=l.replace(/(?:19|20)\d{2}(?:\s*[–—-]\s*(?:19|20)\d{2})?/g,'');l=l.replace(/\b(?:TV|Mini|Series|Mini Series|TV Series|eps?|episodes?|season|seasons|IMDb|IMDB|rating|PG-?\d{0,2}|TV-?[A-Z-]+|Y7(?:-FV)?|G|PG|R|NR)\b/gi,'');l=l.replace(/[•·|]/g,'');l=l.replace(/^[\-–—•\s]+/,'');l=l.replace(/\s{2,}/g,' ').trim();if(!/[A-Za-z\u0621-\u064A]{2,}/.test(l))continue;if(l.length>60)continue;const k=l.toLowerCase();if(!seen.has(k)){seen.add(k);out.push(l)}}return out}
+function cleanLines(text){
+  const raw=text.split(/\r?\n/).map(x=>x.trim()).filter(Boolean);
+  const out=[];const seen=new Set();
+  for(let l of raw){
+    l=l.replace(/^\s*\d+[)\-:\.]?\s*/,'');
+    l=l.replace(/\[[^\]]*\]|\([^)]*\)|\{[^}]*\}/g,'');
+    l=l.replace(/(?:19|20)\d{2}(?:\s*[–—-]\s*(?:19|20)\d{2})?/g,'');
+    l=l.replace(/\b(?:TV|Mini|Series|Mini Series|TV Series|eps?|episodes?|season|seasons|IMDb|IMDB|rating|PG-?\d{0,2}|TV-?[A-Z-]+|Y7(?:-FV)?|G|PG|R|NR)\b/gi,'');
+    l=l.replace(/[•·|]/g,'');
+    l=l.replace(/^[\-–—•\s]+/,'');
+    l=l.replace(/\s{2,}/g,' ').trim();
+    if(!/[A-Za-z\u0621-\u064A]{2,}/.test(l))continue;
+    if(l.length>60)continue;
+    const k=l.toLowerCase();
+    if(!seen.has(k)){seen.add(k);out.push(l)}
+  }
+  return out
+}
 function show(el){el.style.display='';}
 function hide(el){el.style.display='none';}
 function toast(msg,type='info'){const t=$('#toast');t.className='';t.classList.add('toast-'+(type==='success'?'success':type==='warn'?'warn':type==='error'?'error':'info'));t.textContent=msg;t.style.display='block';setTimeout(()=>t.style.display='none',3000);}
@@ -765,7 +673,8 @@ function toast(msg,type='info'){const t=$('#toast');t.className='';t.classList.a
 function saveState(){
   const state={
     words,mode,playerCount,teamCount,scores,teamScores,currentPlayer,currentWordIndex,
-    usedWordsCount,remainingSecs,hintUsed,stage,currentLang,
+    usedWordsCount,hintUsed,stage,currentLang,
+    phase,paused,remainingScanSecs,remainingPlaySecs,
     homeHidden:$('#home').style.display==='none',
     gameVisible:$('#gameArea').style.display==='flex'
   };
@@ -778,30 +687,27 @@ function loadState(){
   try{
     const st=JSON.parse(s);
     if(!st.words)return false;
-    words=st.words;mode=st.mode||'individual';playerCount=st.playerCount||0;teamCount=st.teamCount||0;
-    scores=st.scores||[];teamScores=st.teamScores||[];currentPlayer=st.currentPlayer||0;
-    currentWordIndex=st.currentWordIndex||0;usedWordsCount=st.usedWordsCount||0;
-    remainingSecs=st.remainingSecs||180;hintUsed=!!st.hintUsed;stage=st.stage||'playing';
-    
+    words=st.words;mode=st.mode||'individual';
+    playerCount=st.playerCount||0;teamCount=st.teamCount||0;
+    scores=st.scores||[];teamScores=st.teamScores||[];
+    currentPlayer=st.currentPlayer||0;currentWordIndex=st.currentWordIndex||0;
+    usedWordsCount=st.usedWordsCount||0;hintUsed=!!st.hintUsed;stage=st.stage||'playing';
+    phase=st.phase||'scan';paused=!!st.paused;
+    remainingScanSecs=st.remainingScanSecs ?? 20;
+    remainingPlaySecs=st.remainingPlaySecs ?? 170;
+
     if(st.currentLang) {
       currentLang = st.currentLang;
       updateLanguage();
     }
-    
-    // Ensure proper modal positioning by resetting home display
-    if(st.homeHidden) {
-      $('#home').style.display='none';
-    } else {
-      $('#home').style.display='block';
-    }
-    
+
+    if(st.homeHidden) { $('#home').style.display='none'; } else { $('#home').style.display='block'; }
     if(st.gameVisible){
       $('#gameArea').style.display='flex';
       buildScoreboard();restoreTurn();
     } else {
       $('#gameArea').style.display='none';
     }
-    
     updateHomeStats();
     return true;
   }catch(e){
@@ -818,10 +724,12 @@ function updateGameUI() {
 window.addEventListener('beforeunload',saveState);
 if(localStorage.getItem('bgImageData')){document.body.style.backgroundImage=`url('${localStorage.getItem('bgImageData')}')`}
 $('#bgUpload').addEventListener('change',e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=ev=>{const data=ev.target.result;document.body.style.backgroundImage=`url('${data}')`;localStorage.setItem('bgImageData',data)};r.readAsDataURL(f)});
+
 const previewModal=$('#previewModal');
 function openPreview(list){$('#previewList').innerHTML='<ol>'+list.map(w=>`<li>${w}</li>`).join('')+'</ol>';previewModal.classList.add('active')}
 $('#previewBtn').onclick=()=>{if(words.length===0){toast(translate('no_words'),'warn');return}openPreview(words)}
 $('#closePreview').onclick=()=>previewModal.classList.remove('active')
+
 const setupModal=$('#setupModal');
 const closeSetup=document.getElementById('closeSetup');
 if(closeSetup){closeSetup.onclick=()=>setupModal.classList.remove('active');}
@@ -833,46 +741,276 @@ $('#backTo1').onclick=()=>setStep(1);
 $('#toStep3').onclick=()=>{if(words.length===0){toast('اختر/أدخل قائمة أولاً','warn');return}buildSummary();setStep(3)};
 $('#backTo2').onclick=()=>setStep(2);
 function updateCurrentCount(){const el=document.getElementById('currentCount');if(el)el.textContent=words.length}
-function saveDirect(){const cleaned=cleanLines($('#pasteArea').value);if(cleaned.length===0){toast(translate('empty_list'),'warn');return}words=cleaned;$('#pasteArea').value=cleaned.join('\n');updateCurrentCount();toast(translate('saved_direct'),'success');saveState()}
+
+// Shuffle helpers
+function shuffleInPlace(arr){for(let i=arr.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[arr[i],arr[j]]=[arr[j],arr[i]]}return arr}
+function shuffleForGameplay(){
+  if($('#gameArea').style.display==='flex' && usedWordsCount>0){
+    // Keep used, shuffle remaining
+    const used=words.slice(0,usedWordsCount);
+    const rem=words.slice(usedWordsCount);
+    shuffleInPlace(rem);
+    words=[...used,...rem];
+  }else{
+    shuffleInPlace(words);
+  }
+}
+
+// Save list actions (now shuffle on save)
+function saveDirect(){
+  const cleaned=cleanLines($('#pasteArea').value);
+  if(cleaned.length===0){toast(translate('empty_list'),'warn');return}
+  words=cleaned;
+  shuffleForGameplay();
+  $('#pasteArea').value=words.join('\n');
+  updateCurrentCount();
+  toast(translate('saved_direct'),'success');
+  saveState()
+}
 $('#saveDirect').onclick=saveDirect;
+
 async function ensureGeminiKey(){if(geminiKey)return geminiKey;const v=$('#geminiKeyInput')?$('#geminiKeyInput').value.trim():'';if(v){geminiKey=v;return geminiKey}return await new Promise(res=>{const m=$('#apiKeyModal');if(!m){res(null);return}m.classList.add('active');const confirm=$('#confirmApi');const cancel=$('#cancelApi');if(confirm)confirm.onclick=()=>{const k=$('#apiKeyField').value.trim();if(!k){toast(translate('enter_key'),'error');return}geminiKey=k;m.classList.remove('active');res(k)};if(cancel)cancel.onclick=()=>{m.classList.remove('active');res(null)}})}
 async function geminiExtractOrGenerate(key,promptText){const res=await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key='+key,{method:'POST',headers:{'Content-Type':'application/json','Accept':'application/json'},body:JSON.stringify({contents:[{parts:[{text:promptText}]}]})});const data=await res.json();let text='';if(data.candidates&&data.candidates[0]&&data.candidates[0].content&&data.candidates[0].content.parts&&data.candidates[0].content.parts[0]){text=data.candidates[0].content.parts[0].text||''}else if(data.text){text=data.text}return text}
-async function generateWithGemini(){const key=await ensureGeminiKey();if(!key){toast(translate('enter_key'),'error');return}const topic=$('#geminiTopic').value.trim()||'مواضيع متنوعة';const num=parseInt($('#geminiCount').value)||20;try{const promptText=`أنت مُنقّي/مولّد لكلمات لعبة تمثيل صامت. المدخل قد يكون موضوعًا عامًا أو نصًا فوضويًا يحتوي أمثلة. أعد بالضبط ${num} عنصرًا مناسبًا للعبة. إذا بدا المدخل قائمة فوضوية فاستخرج العناصر ونقِّها، وإلا أنشئ عناصر جديدة من نفس الموضوع. القواعد: عنصر واحد في كل سطر فقط، بدون ترقيم أو أقواس أو سنوات أو تقييمات أو كلمات مثل TV Series/eps/season، احذف التكرارات، حافظ على لغة كل عنصر كما وردت، ويفضل 1–3 كلمات. المدخل:\n\n${topic}`;const text=await geminiExtractOrGenerate(key,promptText);let preview=cleanLines(text||topic);if(preview.length>num)preview=preview.slice(0,num);if(preview.length===0){toast(translate('no_words_error'),'error');return}const box=$('#geminiPreview');box.style.display='block';box.innerHTML='<ol>'+preview.map(w=>`<li>${w}</li>`).join('')+'</ol>';document.getElementById('geminiAcceptRow').style.display='flex';box.dataset.tmp=JSON.stringify(preview)}catch(e){toast(translate('connection_error'),'error')}}
+async function generateWithGemini(){
+  const key=await ensureGeminiKey();if(!key){toast(translate('enter_key'),'error');return}
+  const topic=$('#geminiTopic').value.trim()||'مواضيع متنوعة';
+  const num=parseInt($('#geminiCount').value)||20;
+  try{
+    const promptText=`أنت مُنقّي/مولّد لكلمات لعبة تمثيل صامت. المدخل قد يكون موضوعًا عامًا أو نصًا فوضويًا يحتوي أمثلة. أعد بالضبط ${num} عنصرًا مناسبًا للعبة. إذا بدا المدخل قائمة فوضوية فاستخرج العناصر ونقِّها، وإلا أنشئ عناصر جديدة من نفس الموضوع. القواعد: عنصر واحد في كل سطر فقط، بدون ترقيم أو أقواس أو سنوات أو تقييمات أو كلمات مثل TV Series/eps/season، احذف التكرارات، حافظ على لغة كل عنصر كما وردت، ويفضل 1–3 كلمات. المدخل:\n\n${topic}`;
+    const text=await geminiExtractOrGenerate(key,promptText);
+    let preview=cleanLines(text||topic);
+    if(preview.length>num)preview=preview.slice(0,num);
+    if(preview.length===0){toast(translate('no_words_error'),'error');return}
+    const box=$('#geminiPreview');
+    box.style.display='block';
+    box.innerHTML='<ol>'+preview.map(w=>`<li>${w}</li>`).join('')+'</ol>';
+    document.getElementById('geminiAcceptRow').style.display='flex';
+    box.dataset.tmp=JSON.stringify(preview)
+  }catch(e){toast(translate('connection_error'),'error')}
+}
 $('#generateGemini').onclick=generateWithGemini;
-$('#acceptGemini').onclick=()=>{const box=$('#geminiPreview');if(!box.dataset.tmp){toast(translate('no_preview'),'warn');return}words=JSON.parse(box.dataset.tmp);updateCurrentCount();toast(translate('accepted_gemini'),'success');saveState()}
-async function saveWithGemini(){const raw=$('#pasteArea').value.trim();if(!raw){toast(translate('empty_paste'),'warn');return}const key=await ensureGeminiKey();if(!key){toast(translate('enter_key'),'error');return}try{const promptText=`أنت أداة تنظيف واستخراج لقوائم لعبة تمثيل صامت. يُدخل المستخدم نصًا فوضويًا قد يحوي ترقيمًا وسنوات وتقييمات وأسماء ممثلين وأوصافًا. المطلوب: استخرج قائمة بالعناصر الأساسية فقط (مثل أسماء المسلسلات/الأفلام/الأشياء) عنصر واحد في كل سطر، بدون ترقيم أو أقواس أو سنوات أو تقييمات أو كلمات مثل TV Series/Mini Series/eps/season، واحذف التكرارات، ولا تُضف أي نص آخر ولا تترجم. النص:\n\n${raw}`;const text=await geminiExtractOrGenerate(key,promptText);let cleaned=cleanLines(text);if(cleaned.length===0)cleaned=cleanLines(raw);if(cleaned.length===0){toast(translate('no_valid_words'),'error');return}$('#pasteArea').value=cleaned.join('\n');words=cleaned;updateCurrentCount();toast(translate('cleaned_saved'),'success');saveState()}catch(e){toast(translate('connection_error'),'error')}}
+
+$('#acceptGemini').onclick=()=>{
+  const box=$('#geminiPreview');
+  if(!box.dataset.tmp){toast(translate('no_preview'),'warn');return}
+  words=JSON.parse(box.dataset.tmp);
+  shuffleForGameplay();
+  updateCurrentCount();
+  toast(translate('accepted_gemini'),'success');
+  saveState()
+}
+
+async function saveWithGemini(){
+  const raw=$('#pasteArea').value.trim();if(!raw){toast(translate('empty_paste'),'warn');return}
+  const key=await ensureGeminiKey();if(!key){toast(translate('enter_key'),'error');return}
+  try{
+    const promptText=`أنت أداة تنظيف واستخراج لقوائم لعبة تمثيل صامت. يُدخل المستخدم نصًا فوضويًا قد يحوي ترقيمًا وسنوات وتقييمات وأسماء ممثلين وأوصافًا. المطلوب: استخرج قائمة بالعناصر الأساسية فقط (مثل أسماء المسلسلات/الأفلام/الأشياء) عنصر واحد في كل سطر، بدون ترقيم أو أقواس أو سنوات أو تقييمات أو كلمات مثل TV Series/Mini Series/eps/season، واحذف التكرارات، ولا تُضف أي نص آخر ولا تترجم. النص:\n\n${raw}`;
+    const text=await geminiExtractOrGenerate(key,promptText);
+    let cleaned=cleanLines(text);
+    if(cleaned.length===0)cleaned=cleanLines(raw);
+    if(cleaned.length===0){toast(translate('no_valid_words'),'error');return}
+    words=cleaned; shuffleForGameplay();
+    $('#pasteArea').value=words.join('\n');
+    updateCurrentCount();
+    toast(translate('cleaned_saved'),'success');
+    saveState()
+  }catch(e){toast(translate('connection_error'),'error')}
+}
 $('#saveWithGemini').onclick=saveWithGemini;
-function buildSummary(){$('#summary').innerHTML=`<b>${translate(mode==='individual'?'mode_individual':'mode_team')}:</b> · <b>${translate('words')}:</b> ${words.length}`;$('#finalPreview').innerHTML='<ol>'+words.map(w=>`<li>${w}</li>`).join('')+'</ol>'}
-$('#confirmSetup').onclick=()=>{if(mode==='individual'){playerCount=parseInt($('#playersCount').value)||1;scores=new Array(playerCount).fill(0);streak=new Array(playerCount).fill(0)}else{teamCount=parseInt($('#teamsCount').value)||2;playerCount=teamCount;teamScores=new Array(playerCount).fill(0);streak=new Array(playerCount).fill(0)};setupModal.classList.remove('active');toast(translate('setup_ready'),'success');if($('#muteOnStart').checked){bgm.pause()}else{bgm.play()}saveState()}
-function updateHomeStats(){$('#homeStats').innerHTML=words.length?`<span class=\"badge\">${translate('current_list')}${words.length} ${translate('words')}</span>`:''}
-function buildScoreboard(){const sb=$('#scoreboard');sb.innerHTML='';const arr=(mode==='individual')?scores:teamScores;arr.forEach((s,i)=>{const div=document.createElement('div');div.className='player';div.dataset.idx=i;div.innerHTML=`${translate(mode==='individual'?'player':'team')} ${i+1}: <span>${(+s).toFixed(1)}</span>`;sb.appendChild(div)});highlightActive()}
-function updateScore(idx){const span=document.querySelector(`.player[data-idx=\"${idx}\"] span`);if(span){const arr=(mode==='individual')?scores:teamScores;span.textContent=(+arr[idx]).toFixed(1)}}
-function highlightActive(){document.querySelectorAll('.player').forEach(p=>p.classList.remove('active'));const el=document.querySelector(`.player[data-idx=\"${currentPlayer}\"]`);if(el)el.classList.add('active')}
+
+function buildSummary(){
+  $('#summary').innerHTML=`<b>${translate(mode==='individual'?'mode_individual':'mode_team')}:</b> · <b>${translate('words')}:</b> ${words.length}`;
+  $('#finalPreview').innerHTML='<ol>'+words.map(w=>`<li>${w}</li>`).join('')+'</ol>'
+}
+
+$('#confirmSetup').onclick=()=>{
+  if(mode==='individual'){
+    playerCount=parseInt($('#playersCount').value)||1;
+    scores=new Array(playerCount).fill(0);
+    streak=new Array(playerCount).fill(0)
+  }else{
+    teamCount=parseInt($('#teamsCount').value)||2;
+    playerCount=teamCount;
+    teamScores=new Array(playerCount).fill(0);
+    streak=new Array(playerCount).fill(0)
+  }
+  setupModal.classList.remove('active');
+  toast(translate('setup_ready'),'success');
+  if($('#muteOnStart').checked){bgm.pause()}else{bgm.play()}
+  saveState()
+}
+
+function updateHomeStats(){
+  $('#homeStats').innerHTML=words.length?`<span class="badge">${translate('current_list')}${words.length} ${translate('words')}</span>`:''
+}
+function buildScoreboard(){
+  const sb=$('#scoreboard');sb.innerHTML='';
+  const arr=(mode==='individual')?scores:teamScores;
+  arr.forEach((s,i)=>{
+    const div=document.createElement('div');
+    div.className='player';div.dataset.idx=i;
+    div.innerHTML=`${translate(mode==='individual'?'player':'team')} ${i+1}: <span>${(+s).toFixed(1)}</span>`;
+    sb.appendChild(div)
+  });
+  highlightActive()
+}
+function updateScore(idx){const span=document.querySelector(`.player[data-idx="${idx}"] span`);if(span){const arr=(mode==='individual')?scores:teamScores;span.textContent=(+arr[idx]).toFixed(1)}}
+function highlightActive(){document.querySelectorAll('.player').forEach(p=>p.classList.remove('active'));const el=document.querySelector(`.player[data-idx="${currentPlayer}"]`);if(el)el.classList.add('active')}
 
 function goHome(){
   $('#gameArea').style.display='none';
   $('#home').style.display='block';
   bgm.pause();
   stage='ended';
+  clearInterval(timerInterval);
   saveState();
   updateHomeStats();
-  
-  // Ensure game end modal is closed
   $('#gameEndModal').classList.remove('active');
 }
 
-function startGame(){if(words.length===0){if(confirm(translate('no_word_list'))){words=[...defaultWords];updateHomeStats()}else{toast(translate('setup_first'),'warn');return}}if(mode==='individual'&&playerCount<=0){playerCount=3;scores=new Array(playerCount).fill(0);streak=new Array(playerCount).fill(0)}if(mode==='team'&&playerCount<=0){playerCount=2;teamScores=new Array(playerCount).fill(0);streak=new Array(playerCount).fill(0)}$('#home').style.display='none';$('#gameArea').style.display='flex';currentPlayer=0;currentWordIndex=0;usedWordsCount=0;stage='playing';buildScoreboard();showTurn();saveState()}
+// Timer + Phases
 function updateProgress(){$('#progress').textContent=`${translate('word')} ${usedWordsCount+1} ${translate('of')} ${words.length}`}
-function startTimer(secs=180){clearInterval(timerInterval);remainingSecs=secs;tickTimer();timerInterval=setInterval(()=>{remainingSecs--;if(remainingSecs<=15)$('#timer').classList.add('low');else $('#timer').classList.remove('low');tickTimer();if(remainingSecs<=0){clearInterval(timerInterval);reveal()}saveState()},1000)}
-function tickTimer(){const m=Math.floor(remainingSecs/60).toString().padStart(2,'0');const s=(remainingSecs%60).toString().padStart(2,'0');$('#timer').textContent=`${m}:${s}`}
-function showTurn(){$('#answer').style.display='none';$('#hint').textContent='';hintUsed=false;$('#playRow').style.display='flex';$('#actionRow').style.display='none';updateGameUI();updateProgress();const special=((usedWordsCount+1)%5===0);$('#qr').classList.toggle('special',special);renderQR(words[currentWordIndex]);startTimer(180);highlightActive();stage='playing';saveState()}
-function reveal(){$('#answer').textContent=words[currentWordIndex];$('#answer').style.display='block';$('#playRow').style.display='none';$('#actionRow').style.display='flex';$('#qr').innerHTML='<img src="https://media.giphy.com/media/du3J3cXyzhj75IOgvA/giphy.gif" style="width:256px;height:256px;border-radius:12px">';clearInterval(timerInterval);stage='revealed';saveState()}
-function calcPoints(){if(hintUsed)return 0.5;let pts=1.0;if(remainingSecs>120)pts+=0.5;else if(remainingSecs>60)pts+=0.25;if(remainingSecs>150)pts+=0.5;return Math.max(0.1,Math.round(pts*10)/10)}
-function checkAchievements(points){const arr=(mode==='individual')?scores:teamScores;const s=arr[currentPlayer];if(points>=1.5)pushBadge(translate('speed_bonus'));if(s>=10)pushBadge(translate('reached_10'))}
+
+function formatMMSS(x){const m=Math.floor(x/60).toString().padStart(2,'0');const s=(x%60).toString().padStart(2,'0');return `${m}:${s}`}
+
+function tickTimer(){
+  const tEl=$('#timer');
+  if(phase==='scan'){
+    tEl.classList.add('scan'); tEl.classList.remove('low');
+    tEl.textContent = `${formatMMSS(remainingScanSecs)}`
+  }else{
+    tEl.classList.remove('scan');
+    if(remainingPlaySecs<=15)tEl.classList.add('low'); else tEl.classList.remove('low');
+    tEl.textContent = `${formatMMSS(remainingPlaySecs)}`
+  }
+  tEl.classList.toggle('paused', paused);
+}
+
+function startScanPhase(){
+  phase='scan'; paused=false;
+  remainingScanSecs=20;
+  $('#qr').classList.add('scan-phase');
+  $('#qr').setAttribute('data-scan-label', translate('scan_qr'));
+  $('#revealBtn').disabled = true;
+  $('#hintBtn').disabled = true;
+  toast(translate('scan_free'),'info');
+  clearInterval(timerInterval);
+  tickTimer();
+  timerInterval=setInterval(()=>{
+    if(paused) return;
+    remainingScanSecs--; tickTimer();
+    if(remainingScanSecs<=0){
+      clearInterval(timerInterval);
+      endScanStartPlay();
+    }
+    saveState();
+  },1000)
+}
+
+function endScanStartPlay(){
+  $('#qr').classList.remove('scan-phase');
+  $('#revealBtn').disabled = false;
+  $('#hintBtn').disabled = false;
+  startPlayTimer();
+}
+
+function startPlayTimer(initial=null){
+  phase='play';
+  if(initial!==null){remainingPlaySecs=initial}else{remainingPlaySecs=170}
+  clearInterval(timerInterval);
+  tickTimer();
+  timerInterval=setInterval(()=>{
+    if(paused) return;
+    remainingPlaySecs--;
+    tickTimer();
+    if(remainingPlaySecs<=0){
+      clearInterval(timerInterval);
+      reveal();
+    }
+    saveState();
+  },1000)
+}
+
+function togglePause(){
+  paused = !paused;
+  const btn=$('#pauseBtn');
+  if(btn) btn.textContent = translate(paused ? 'resume' : 'pause');
+  tickTimer();
+  saveState();
+}
+
+// Turn flow
+function showTurn(){
+  $('#answer').style.display='none';
+  $('#hint').textContent='';
+  hintUsed=false;
+  $('#playRow').style.display='flex';
+  $('#actionRow').style.display='none';
+  updateGameUI(); updateProgress();
+  const special=((usedWordsCount+1)%5===0);
+  $('#qr').classList.toggle('special',special);
+  renderQR(words[currentWordIndex]);
+  startScanPhase(); // 20s free scan, then 2:50 play
+  highlightActive();
+  stage='playing';
+  saveState()
+}
+
+function reveal(){
+  $('#answer').textContent=words[currentWordIndex];
+  $('#answer').style.display='block';
+  $('#playRow').style.display='none';
+  $('#actionRow').style.display='flex';
+  $('#qr').innerHTML='<img src="https://media.giphy.com/media/du3J3cXyzhj75IOgvA/giphy.gif" style="width:256px;height:256px;border-radius:12px">';
+  clearInterval(timerInterval);
+  stage='revealed';
+  saveState()
+}
+
+function calcPoints(){
+  // Use only gameplay remaining time (scan time excluded)
+  if(hintUsed)return 0.5;
+  let pts=1.0;
+  if(remainingPlaySecs>120)pts+=0.5;
+  else if(remainingPlaySecs>60)pts+=0.25;
+  if(remainingPlaySecs>150)pts+=0.5;
+  return Math.max(0.1,Math.round(pts*10)/10)
+}
+
+function checkAchievements(points){
+  const arr=(mode==='individual')?scores:teamScores;
+  const s=arr[currentPlayer];
+  if(points>=1.5)pushBadge(translate('speed_bonus'));
+  if(s>=10)pushBadge(translate('reached_10'))
+}
 function pushBadge(html){const box=$('#achievements');const el=document.createElement('div');el.className='badge badge-pop';el.innerHTML=html;box.appendChild(el);setTimeout(()=>el.remove(),4000)}
-function judge(correct){if(correct){const earned=calcPoints();if(mode==='individual'){scores[currentPlayer]+=earned}else{teamScores[currentPlayer]+=earned}updateScore(currentPlayer);toast(`${translate(mode==='individual'?'player':'team')} ${currentPlayer+1} ${translate('scored')} ${earned.toFixed(1)} ${translate('points')}!`,'success');checkAchievements(earned)}else{toast(translate('wrong_answer'),'warn')}next(true)}
-function next(advanceTurn){usedWordsCount++;if(usedWordsCount>=words.length){return endGame()}currentWordIndex=(currentWordIndex+1)%words.length;if(advanceTurn){currentPlayer=(currentPlayer+1)%playerCount}showTurn();saveState()}
-function skipWord(){usedWordsCount++;if(usedWordsCount>=words.length){return endGame()}currentWordIndex=(currentWordIndex+1)%words.length;showTurn();saveState()}
+
+function judge(correct){
+  if(correct){
+    const earned=calcPoints();
+    if(mode==='individual'){scores[currentPlayer]+=earned}else{teamScores[currentPlayer]+=earned}
+    updateScore(currentPlayer);
+    toast(`${translate(mode==='individual'?'player':'team')} ${currentPlayer+1} ${translate('scored')} ${earned.toFixed(1)} ${translate('points')}!`,'success');
+    checkAchievements(earned)
+  }else{
+    toast(translate('wrong_answer'),'warn')
+  }
+  next(true)
+}
+
+function next(advanceTurn){
+  usedWordsCount++;
+  if(usedWordsCount>=words.length){return endGame()}
+  currentWordIndex=(currentWordIndex+1)%words.length;
+  if(advanceTurn){currentPlayer=(currentPlayer+1)%playerCount}
+  showTurn(); saveState()
+}
+function skipWord(){
+  usedWordsCount++;
+  if(usedWordsCount>=words.length){return endGame()}
+  currentWordIndex=(currentWordIndex+1)%words.length;
+  showTurn(); saveState()
+}
 
 function endGame(){
   $('#gameArea').style.display='none';
@@ -887,13 +1025,11 @@ function endGame(){
       <span>${s.toFixed(1)} ${translate('points')}</span>
     </div>`;
   }).join('');
-  
+
   $('#winnerName').textContent = `🏆 ${winners.join(' و ')}`;
   $('#finalScores').innerHTML = finalScoresHtml;
-  
-  const gameEndModal = $('#gameEndModal');
-  gameEndModal.classList.add('active');
-  
+  $('#gameEndModal').classList.add('active');
+
   if(!window._muted) {
     bgm.currentTime = 0;
     bgm.play();
@@ -902,18 +1038,14 @@ function endGame(){
 
 $('#playAgainBtn').onclick = () => {
   $('#gameEndModal').classList.remove('active');
-  if(mode==='individual') {
-    scores = new Array(playerCount).fill(0);
-  } else {
-    teamScores = new Array(playerCount).fill(0);
-  }
+  if(mode==='individual') { scores = new Array(playerCount).fill(0); }
+  else { teamScores = new Array(playerCount).fill(0); }
   currentPlayer = 0;
   currentWordIndex = 0;
   usedWordsCount = 0;
   stage = 'playing';
-  
+  // Shuffle full list for new round
   words = [...words].sort(() => Math.random() - 0.5);
-  
   startGame();
   toast(translate('new_game_start'), 'success');
 };
@@ -923,16 +1055,147 @@ $('#backToHomeBtn').onclick = () => {
   goHome();
 };
 
-function restoreTurn(){$('#home').style.display='none';$('#gameArea').style.display='flex';buildScoreboard();updateGameUI();updateProgress();highlightActive();if(stage==='revealed'){ $('#answer').textContent=words[currentWordIndex];$('#answer').style.display='block';$('#playRow').style.display='none';$('#actionRow').style.display='flex';$('#qr').innerHTML='<img src="https://media.giphy.com/media/du3J3cXyzhj75IOgvA/giphy.gif" style="width:256px;height:256px;border-radius:12px">';}else if(stage==='playing'){ $('#answer').style.display='none';$('#playRow').style.display='flex';$('#actionRow').style.display='none';renderQR(words[currentWordIndex]);startTimer(remainingSecs)}}
-function makeHint(word){const letters=word.replace(/[^\u0621-\u064A\sA-Za-z]/g,'');const n=Math.max(1,Math.ceil(letters.length*0.3));return word.slice(0,n)+'…'}
+function restoreTurn(){
+  $('#home').style.display='none';
+  $('#gameArea').style.display='flex';
+  buildScoreboard();
+  updateGameUI(); updateProgress(); highlightActive();
+  if(stage==='revealed'){
+    $('#answer').textContent=words[currentWordIndex];
+    $('#answer').style.display='block';
+    $('#playRow').style.display='none';
+    $('#actionRow').style.display='flex';
+    $('#qr').innerHTML='<img src="https://media.giphy.com/media/du3J3cXyzhj75IOgvA/giphy.gif" style="width:256px;height:256px;border-radius:12px">';
+  }else if(stage==='playing'){
+    $('#answer').style.display='none';
+    $('#playRow').style.display='flex';
+    $('#actionRow').style.display='none';
+    renderQR(words[currentWordIndex]);
+    if(phase==='scan'){
+      $('#qr').classList.add('scan-phase');
+      $('#qr').setAttribute('data-scan-label', translate('scan_qr'));
+      $('#revealBtn').disabled=true; $('#hintBtn').disabled=true;
+      clearInterval(timerInterval); tickTimer();
+      timerInterval=setInterval(()=>{
+        if(paused)return;
+        remainingScanSecs--; tickTimer();
+        if(remainingScanSecs<=0){clearInterval(timerInterval); endScanStartPlay();}
+        saveState();
+      },1000);
+    }else{
+      $('#qr').classList.remove('scan-phase');
+      $('#revealBtn').disabled=false; $('#hintBtn').disabled=false;
+      clearInterval(timerInterval); tickTimer();
+      timerInterval=setInterval(()=>{
+        if(paused)return;
+        remainingPlaySecs--; tickTimer();
+        if(remainingPlaySecs<=0){clearInterval(timerInterval); reveal();}
+        saveState();
+      },1000);
+    }
+  }
+}
+
+// Hint menu with adaptive options
+function makePartialHint(word, part){
+  const clean=word.replace(/[^\u0621-\u064A\sA-Za-z]/g,'');
+  const L=clean.length||word.length;
+  const k=Math.max(1,Math.ceil(L*0.3));
+  if(part==='begin'){return clean.slice(0,k)+'…'}
+  if(part==='end'){return '…'+clean.slice(Math.max(0,L-k))}
+  if(part==='middle'){
+    const start=Math.max(1,Math.floor((L-k)/2));
+    return '…'+clean.slice(start,start+k)+'…'
+  }
+  return clean.slice(0,Math.max(1,Math.ceil(L*0.3)))+'…'
+}
+
+const hintMenu = document.createElement('div');
+hintMenu.className='hint-menu';
+hintMenu.id='hintMenu';
+hintMenu.innerHTML = `
+  <div class="hint-title"></div>
+  <button data-part="begin"></button>
+  <button data-part="middle"></button>
+  <button data-part="end"></button>
+`;
+document.body.appendChild(hintMenu);
+
+function positionHintMenu(){
+  const btn=$('#hintBtn');
+  const r=btn.getBoundingClientRect();
+  hintMenu.style.left = (r.left + window.scrollX) + 'px';
+  hintMenu.style.top = (r.bottom + window.scrollY + 8) + 'px';
+}
+function openHintMenu(){
+  if(hintUsed) return;
+  positionHintMenu();
+  hintMenu.querySelector('.hint-title').textContent = translate('choose_hint_part');
+  hintMenu.querySelector('button[data-part="begin"]').textContent = translate('reveal_begin');
+  hintMenu.querySelector('button[data-part="middle"]').textContent = translate('reveal_middle');
+  hintMenu.querySelector('button[data-part="end"]').textContent = translate('reveal_end');
+  hintMenu.classList.add('active');
+}
+function closeHintMenu(){hintMenu.classList.remove('active')}
+
+hintMenu.addEventListener('click', (e)=>{
+  const btn=e.target.closest('button[data-part]');
+  if(!btn) return;
+  const part=btn.getAttribute('data-part');
+  const word=words[currentWordIndex];
+  const hintStr = makePartialHint(word, part);
+  $('#hint').textContent = translate('hint') + hintStr;
+  hintUsed=true;
+  closeHintMenu();
+  toast(translate('hint_used'),'warn');
+  saveState();
+});
+document.addEventListener('click', (e)=>{
+  const within = e.target.closest('#hintMenu') || e.target.closest('#hintBtn');
+  if(!within) closeHintMenu();
+});
+window.addEventListener('resize', ()=>{ if(hintMenu.classList.contains('active')) positionHintMenu(); });
+
+// Controls
+function startGame(){
+  if(words.length===0){
+    if(confirm(translate('no_word_list'))){words=[...defaultWords];updateHomeStats()}
+    else{toast(translate('setup_first'),'warn');return}
+  }
+  // Ensure player/team arrays
+  if(mode==='individual'&&playerCount<=0){playerCount=3;scores=new Array(playerCount).fill(0);streak=new Array(playerCount).fill(0)}
+  if(mode==='team'&&playerCount<=0){playerCount=2;teamScores=new Array(playerCount).fill(0);streak=new Array(playerCount).fill(0)}
+  // Shuffle list at game start
+  shuffleInPlace(words);
+  $('#home').style.display='none';
+  $('#gameArea').style.display='flex';
+  currentPlayer=0;currentWordIndex=0;usedWordsCount=0;
+  phase='scan';paused=false;remainingScanSecs=20;remainingPlaySecs=170;
+  stage='playing';
+  buildScoreboard();showTurn();saveState()
+}
+
 $('#startBtn').onclick=startGame;
 $('#revealBtn').onclick=()=>reveal();
 $('#correctBtn').onclick=()=>judge(true);
 $('#wrongBtn').onclick=()=>judge(false);
 $('#skipBtn').onclick=skipWord;
 $('#endGameInPlay').onclick=()=>{if(confirm(translate('confirm_end')))goHome()};
-$('#hintBtn').onclick=()=>{if(!hintUsed){$('#hint').textContent=translate('hint')+makeHint(words[currentWordIndex]);hintUsed=true;toast(translate('hint_used'),'warn');saveState()}};
-window._muted=false;$('#muteBtn').onclick=()=>{window._muted=!window._muted;if(window._muted){bgm.pause();toast(translate('sounds_muted'),'info')}else{bgm.play();toast(translate('sounds_on'),'info')}};
+$('#hintBtn').onclick=()=>{ if(!hintUsed && !$('#hintBtn').disabled) openHintMenu(); };
+$('#hintBtn').addEventListener('mouseenter', ()=>{ if(!hintUsed && !$('#hintBtn').disabled) openHintMenu(); });
+$('#pauseBtn').onclick=togglePause;
+
+// Optional mute button guard (in case it exists elsewhere)
+window._muted=false;
+const muteEl = document.getElementById('muteBtn');
+if(muteEl){
+  muteEl.onclick=()=>{
+    window._muted=!window._muted;
+    if(window._muted){bgm.pause();toast(translate('sounds_muted'),'info')}
+    else{bgm.play();toast(translate('sounds_on'),'info')}
+  };
+}
+
 window.addEventListener('DOMContentLoaded',()=>{loadState();updateHomeStats();});
 </script>
 </body>
