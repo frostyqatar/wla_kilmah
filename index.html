@@ -140,9 +140,60 @@ button:active{transform:translateY(0) scale(.98)}
 }
 @keyframes scanSweep{0%{top:-40%}100%{top:140%}}
 
-#answer{font-size:1.8rem;font-weight:700;display:none;padding:1rem;background:var(--secondary);border-radius:12px;border:2px solid var(--primary);text-align:center}
+#answer{font-size:1.8rem;font-weight:700;display:none;padding:1rem;background:var(--secondary);border-radius:12px;border:2px solid var(--primary);text-align:center;position:relative;overflow:hidden}
+/* Aurora + Starry overlay for answer */
+#answer::before{
+  content:'';position:absolute;inset:-25%;pointer-events:none;
+  background:
+    radial-gradient(140% 70% at 10% 0%, rgba(59,130,246,.28), transparent 60%),
+    radial-gradient(120% 60% at 90% 5%, rgba(34,197,94,.24), transparent 60%),
+    radial-gradient(160% 80% at 50% 110%, rgba(236,72,153,.22), transparent 60%);
+  filter: blur(18px) saturate(1.2);
+  animation: auroraShift 11s linear infinite;
+  mix-blend-mode: screen;
+}
+#answer::after{
+  content:'';position:absolute;inset:0;pointer-events:none;opacity:.6;
+  background-image:
+    radial-gradient(2.4px 2.4px at 12% 22%, rgba(255,255,255,1) 45%, transparent 52%),
+    radial-gradient(2.2px 2.2px at 28% 68%, rgba(255,255,255,.95) 45%, transparent 52%),
+    radial-gradient(2.4px 2.4px at 74% 18%, rgba(255,255,255,.92) 45%, transparent 52%),
+    radial-gradient(2.4px 2.4px at 86% 54%, rgba(255,255,255,.95) 45%, transparent 52%),
+    radial-gradient(2.0px 2.0px at 42% 38%, rgba(255,255,255,.95) 45%, transparent 52%),
+    radial-gradient(1.8px 1.8px at 61% 76%, rgba(255,255,255,.95) 45%, transparent 52%),
+    radial-gradient(1.8px 1.8px at 35% 83%, rgba(255,255,255,.95) 45%, transparent 52%),
+    radial-gradient(1.8px 1.8px at 90% 82%, rgba(255,255,255,.95) 45%, transparent 52%),
+    radial-gradient(1.6px 1.6px at 18% 45%, rgba(255,255,255,.9) 45%, transparent 52%),
+    radial-gradient(1.6px 1.6px at 70% 70%, rgba(255,255,255,.9) 45%, transparent 52%);
+  filter: drop-shadow(0 0 8px rgba(255,255,255,.6)) drop-shadow(0 0 14px rgba(255,255,255,.35));
+  animation: twinkle 2.1s steps(2) infinite, starDrift 18s linear infinite;
+}
+@keyframes auroraShift{to{transform:translate3d(-4%, -2%, 0) rotate(-1deg)}}
+@keyframes twinkle{50%{opacity:.5}100%{opacity:.95}}
+@keyframes starDrift{0%{transform:translate3d(0,0,0)}50%{transform:translate3d(1.2%, -1%, 0)}100%{transform:translate3d(0,0,0)}}
+
+/* Starry outline ring overlay */
+#answer .answer-outline{
+  position:absolute; inset:-6px; border-radius:16px; pointer-events:none; opacity:.95;
+  background-image:
+    radial-gradient(2.8px 2.8px at 10% 15%, rgba(255,255,255,1) 45%, transparent 52%),
+    radial-gradient(2.6px 2.6px at 30% 8%, rgba(255,255,255,.95) 45%, transparent 52%),
+    radial-gradient(2.8px 2.8px at 55% 6%, rgba(255,255,255,.95) 45%, transparent 52%),
+    radial-gradient(2.6px 2.6px at 80% 12%, rgba(255,255,255,.95) 45%, transparent 52%),
+    radial-gradient(2.2px 2.2px at 92% 35%, rgba(255,255,255,.9) 45%, transparent 52%),
+    radial-gradient(2.4px 2.4px at 88% 70%, rgba(255,255,255,.9) 45%, transparent 52%),
+    radial-gradient(2.6px 2.6px at 70% 90%, rgba(255,255,255,.95) 45%, transparent 52%),
+    radial-gradient(2.6px 2.6px at 35% 92%, rgba(255,255,255,.95) 45%, transparent 52%),
+    radial-gradient(2.4px 2.4px at 12% 82%, rgba(255,255,255,.9) 45%, transparent 52%),
+    radial-gradient(2.6px 2.6px at 6% 55%, rgba(255,255,255,.95) 45%, transparent 52%);
+  -webkit-mask: radial-gradient(closest-side, transparent calc(100% - 12px), #000 100%);
+  mask: radial-gradient(closest-side, transparent calc(100% - 12px), #000 100%);
+  filter: drop-shadow(0 0 10px rgba(255,255,255,.4));
+  animation: twinkle 2.4s steps(2) infinite, ringSpin 22s linear infinite;
+}
+@keyframes ringSpin{to{transform:rotate(360deg)}}
 #hint{font-size:2.0rem;color:#ffffff;min-height:1.2rem;text-align:center;font-weight:600}
-#scoreboard{display:flex;gap:.6rem;flex-wrap:wrap;justify-content:center}
+#scoreboard{display:none}
 
 /* Enhanced Player with Golden Glow */
 .player{background:var(--secondary);padding:.6rem 1rem;border-radius:12px;font-size:1rem;display:flex;align-items:center;gap:.4rem;transition:all .3s ease;border:2px solid transparent;position:relative}
@@ -174,6 +225,21 @@ button:active{transform:translateY(0) scale(.98)}
 @keyframes blink{50%{filter:brightness(1.4)}}
 .controls-inline{display:flex;gap:.6rem;flex-wrap:wrap;justify-content:center}
 .game-footer{display:flex;gap:.8rem;justify-content:center;margin-top:.6rem}
+
+/* Right-floating leaderboard that doesn't affect center alignment */
+#gameArea{position:relative; z-index:10}
+#leaderboard{position:fixed; inset-inline-end: min(2vw, 20px); top: 120px; width: 280px; background:var(--secondary); border:2px solid var(--primary); border-radius:14px; padding:.8rem; min-width:260px; display:none}
+.leaderboard-title{font-weight:800; color:#fff; text-align:center; margin-bottom:.4rem; letter-spacing:.5px}
+.leaderboard-list{display:flex; flex-direction:column; gap:.5rem; position:relative}
+.lb-item{display:flex; align-items:center; justify-content:space-between; gap:.6rem; padding:.55rem .7rem; border:1px solid var(--primary); border-radius:12px; background:rgba(6,24,38,.6); transform:translateY(0); transition:transform .35s ease, box-shadow .35s ease}
+.lb-item.slide{box-shadow:0 12px 28px rgba(0,0,0,.45)}
+.lb-item.active-turn{border-color:var(--gold); background:var(--primary); transform:scale(1.03); box-shadow:0 0 20px var(--gold), 0 0 40px rgba(255,215,0,.3); animation:goldenGlow 2s infinite ease-in-out}
+.lb-rank{font-weight:900; width:28px; text-align:center}
+.lb-name{flex:1; font-weight:700}
+.lb-score{font-weight:800}
+.lb-gold{background:linear-gradient(180deg,#3b2f00,#7a5d00); border-color:#d4af37; box-shadow:0 0 10px rgba(212,175,55,.35)}
+.lb-silver{background:linear-gradient(180deg,#2b2b2b,#6a6a6a); border-color:#c0c0c0; box-shadow:0 0 10px rgba(192,192,192,.3)}
+.lb-bronze{background:linear-gradient(180deg,#3b2416,#7a4a2b); border-color:#cd7f32; box-shadow:0 0 10px rgba(205,127,50,.3)}
 
 /* Hint menu */
 .hint-menu{
@@ -248,6 +314,7 @@ button:active{transform:translateY(0) scale(.98)}
 
 /* Enhanced Mobile Responsive Design */
 @media (max-width: 768px) {
+  #leaderboard{position:relative; inset:auto; width:100%; margin:0 auto; top:auto; display:none}
   .hero { min-height: 100vh; padding: 1rem; justify-content: flex-start; padding-top: 2rem; }
   .hero .card { padding: 1.5rem; width: 95vw; max-width: none; margin: 0; }
   .hero .panel { min-height: auto; padding: 1.2rem; }
@@ -366,6 +433,11 @@ button:active{transform:translateY(0) scale(.98)}
     <button id="endGameInPlay" class="btn-end" data-ar="إنهاء اللعبة والعودة" data-en="End Game & Return">إنهاء اللعبة والعودة</button>
   </div>
   <div class="badges" id="achievements"></div>
+</div>
+
+<div id="leaderboard">
+  <div class="leaderboard-title" data-ar="الترتيب" data-en="Leaderboard">الترتيب</div>
+  <div id="leaderboardList" class="leaderboard-list"></div>
 </div>
 
 <!-- Game End Modal -->
@@ -621,9 +693,9 @@ function updateLanguage() {
   // Update language toggle button
   document.getElementById('langToggle').textContent = currentLang === 'ar' ? 'English' : 'العربية';
 
-  // Update pause button text to reflect state
+  // Update pause button text to reflect state; if disabled, show 'paused'
   const pauseBtn = document.getElementById('pauseBtn');
-  if (pauseBtn) pauseBtn.textContent = translate(paused ? 'resume' : 'pause');
+  if (pauseBtn) pauseBtn.textContent = pauseBtn.disabled ? translate('paused') : translate(paused ? 'resume' : 'pause');
 
   // Update dynamic content
   updateHomeStats();
@@ -708,7 +780,19 @@ const REVEAL_GIFS=[
   'https://media3.giphy.com/media/v1.Y2lkPTc5MGI3NjExbGtoNjFwOGtvMXBmZno1OHozbWl4aXJuNGc1MmlvdHV0dmVwNHZkayZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/PIEHvHyvDGZiMsN2Cb/giphy.gif',
   'https://media0.giphy.com/media/v1.Y2lkPTc5MGI3NjExdGV0dmZlaDkwamphcjR4d29lMDdhYTVwbDFjdnBpaG1wMmVjcmF1dyZlcD12MV9naWZzX3NlYXJjaCZjdD1n/10AmJ6TIlbYxAk/giphy.webp',
   'https://media2.giphy.com/media/v1.Y2lkPWVjZjA1ZTQ3YjBjMDNic2FhaTdoZnU4NHBkcnJreWI5eW91bWFxa2lyM28xcXpoeCZlcD12MV9naWZzX3NlYXJjaCZjdD1n/mIZ9rPeMKefm0/giphy.webp',
-  'https://media2.giphy.com/media/v1.Y2lkPWVjZjA1ZTQ3dHZ5Z3VqajBlbW1kOXRmcDR0aXAzcmJ0aGM5em9hbnRwejZsZW5sciZlcD12MV9naWZzX3NlYXJjaCZjdD1n/atQF1zaSGq8s8/giphy.webp'
+  'https://media2.giphy.com/media/v1.Y2lkPWVjZjA1ZTQ3dHZ5Z3VqajBlbW1kOXRmcDR0aXAzcmJ0aGM5em9hbnRwejZsZW5sciZlcD12MV9naWZzX3NlYXJjaCZjdD1n/atQF1zaSGq8s8/giphy.webp',
+  'https://media3.giphy.com/media/zjUfl9LhNi13JlFzQ6/200.webp',
+  'https://media3.giphy.com/media/v1.Y2lkPTc5MGI3NjExMHlieGtjNWplYm5oNjNjNm5mN3RiOWZsN3VreGxvM3BqanEyY2N6dCZlcD12MV9naWZzX3RyZW5kaW5nJmN0PWc/1DTBGm5Rfgymk/giphy.webp',
+  'https://media0.giphy.com/media/v1.Y2lkPWVjZjA1ZTQ3cGwxb3ZwejI2eTR3NnJrb2VkYXdjeTBwZW13YzFvOXB6aHB1a3E0MSZlcD12MV9naWZzX3RyZW5kaW5nJmN0PWc/1kwH4pweyDm00/200.webp',
+  'https://media3.giphy.com/media/Mx936qy6jLxyjbqTiR/giphy.webp',
+  'https://media3.giphy.com/media/JBumCoLu1RimmgT1iV/giphy.webp',
+  'https://media4.giphy.com/media/etKriWlT67rFrzVPIr/giphy.webp',
+  'https://media3.giphy.com/media/5oULUaqpLZL4gNuoR7/200.webp',
+  'https://media0.giphy.com/media/4xWGyVKoXqg2eVCiq9/giphy.webp',
+  'https://media4.giphy.com/media/SM8WjRqKBHFizvxz01/giphy.webp'
+
+
+
 ];
 
 const preloaded = REVEAL_GIFS.map(u=>{ const i=new Image(); i.src=u; return i; });
@@ -794,6 +878,17 @@ function updateGameUI() {
   $('#turn').textContent=`${translate('turn')} ${translate(mode==='individual'?'player':'team')} ${currentPlayer+1}`;
   $('#modeBadge').querySelector('span').textContent = translate(mode==='individual'?'mode_individual':'mode_team');
   updateProgress();
+  updateLeaderboard();
+}
+
+function ensureAnswerOutline(){
+  const ans = document.getElementById('answer');
+  if(!ans) return;
+  if(!ans.querySelector('.answer-outline')){
+    const ring = document.createElement('div');
+    ring.className = 'answer-outline';
+    ans.appendChild(ring);
+  }
 }
 
 window.addEventListener('beforeunload',saveState);
@@ -935,12 +1030,46 @@ function buildScoreboard(){
     sb.appendChild(div)
   });
   highlightActive()
+  updateLeaderboard();
 }
 function updateScore(idx){const span=document.querySelector(`.player[data-idx="${idx}"] span`);if(span){const arr=(mode==='individual')?scores:teamScores;span.textContent=(+arr[idx]).toFixed(1)}}
 function highlightActive(){document.querySelectorAll('.player').forEach(p=>p.classList.remove('active'));const el=document.querySelector(`.player[data-idx="${currentPlayer}"]`);if(el)el.classList.add('active')}
 
+function updateLeaderboard(){
+  const listEl = document.getElementById('leaderboardList');
+  if(!listEl) return;
+  const arr = (mode==='individual') ? scores.map((s,i)=>({name:`${translate('player')} ${i+1}`, score:+s}))
+                                   : teamScores.map((s,i)=>({name:`${translate('team')} ${i+1}`, score:+s}));
+  // Sort descending score; stable by index if equal
+  const ranked = arr.map((e,i)=>({...e, i})).sort((a,b)=> b.score - a.score || a.i - b.i);
+  const prevOrder = Array.from(listEl.children).map(ch=>ch.dataset.key);
+  listEl.innerHTML = '';
+  ranked.forEach((e,rankIdx)=>{
+    const item = document.createElement('div');
+    item.className = 'lb-item';
+    if(rankIdx===0) item.classList.add('lb-gold');
+    else if(rankIdx===1) item.classList.add('lb-silver');
+    else if(rankIdx===2) item.classList.add('lb-bronze');
+    item.dataset.key = String(e.i);
+    item.innerHTML = `<div class="lb-rank">${rankIdx+1}</div><div class="lb-name">${e.name}</div><div class="lb-score">${e.score.toFixed(1)}</div>`;
+    if(e.i===currentPlayer){ item.classList.add('active-turn'); }
+    listEl.appendChild(item);
+  });
+  const newOrder = Array.from(listEl.children).map(ch=>ch.dataset.key);
+  // If order changed, briefly add slide effect to items that moved up
+  newOrder.forEach((key,idx)=>{
+    const prevIdx = prevOrder.indexOf(key);
+    if(prevIdx!==-1 && prevIdx>idx){
+      const el = listEl.children[idx];
+      el.classList.add('slide');
+      setTimeout(()=>el.classList.remove('slide'), 400);
+    }
+  });
+}
+
 function goHome(){
   $('#gameArea').style.display='none';
+  const lb=document.getElementById('leaderboard'); if(lb) lb.style.display='none';
   $('#home').style.display='block';
   bgm.pause();
   stage='ended';
@@ -1028,6 +1157,12 @@ function showTurn(){
   hintUsed=false;
   $('#playRow').style.display='flex';
   $('#actionRow').style.display='none';
+  // Re-enable pause for the new turn
+  const _pBtn = $('#pauseBtn');
+  if(_pBtn){
+    _pBtn.disabled = false;
+    _pBtn.textContent = translate('pause');
+  }
   updateGameUI(); updateProgress();
   const special=((usedWordsCount+1)%5===0);
   $('#qr').classList.toggle('special',special);
@@ -1041,8 +1176,15 @@ function showTurn(){
 function reveal(){
   $('#answer').textContent=words[currentWordIndex];
   $('#answer').style.display='block';
+  ensureAnswerOutline();
   $('#playRow').style.display='none';
   $('#actionRow').style.display='flex';
+  // Disable pause during scoring for the revealed word
+  const pBtn = $('#pauseBtn');
+  if(pBtn){
+    pBtn.disabled = true;
+    pBtn.textContent = translate('paused');
+  }
   lastRevealGif = pickRevealGifSafe();
   $('#qr').innerHTML=`<img src="${lastRevealGif}" style="width:256px;height:256px;border-radius:12px;object-fit:cover">`;
   clearInterval(timerInterval);
@@ -1073,6 +1215,7 @@ function judge(correct){
     const earned=calcPoints();
     if(mode==='individual'){scores[currentPlayer]+=earned}else{teamScores[currentPlayer]+=earned}
     updateScore(currentPlayer);
+    updateLeaderboard();
     toast(`${translate(mode==='individual'?'player':'team')} ${currentPlayer+1} ${translate('scored')} ${earned.toFixed(1)} ${translate('points')}!`,'success');
     checkAchievements(earned)
   }else{
@@ -1092,11 +1235,12 @@ function skipWord(){
   usedWordsCount++;
   if(usedWordsCount>=words.length){return endGame()}
   currentWordIndex=(currentWordIndex+1)%words.length;
-  showTurn(); saveState()
+  showTurn(); updateLeaderboard(); saveState()
 }
 
 function endGame(){
   $('#gameArea').style.display='none';
+  const lbEnd=document.getElementById('leaderboard'); if(lbEnd) lbEnd.style.display='none';
   const arr=(mode==='individual')?scores:teamScores;
   const max=Math.max(...arr);
   const winners=[];
@@ -1141,19 +1285,31 @@ $('#backToHomeBtn').onclick = () => {
 function restoreTurn(){
   $('#home').style.display='none';
   $('#gameArea').style.display='flex';
+  const lb=document.getElementById('leaderboard'); if(lb) lb.style.display = (stage==='revealed' || stage==='playing') ? 'block' : 'none';
   buildScoreboard();
   updateGameUI(); updateProgress(); highlightActive();
   if(stage==='revealed'){
     $('#answer').textContent=words[currentWordIndex];
     $('#answer').style.display='block';
+    ensureAnswerOutline();
     $('#playRow').style.display='none';
     $('#actionRow').style.display='flex';
+    const pBtn = $('#pauseBtn');
+    if(pBtn){
+      pBtn.disabled = true;
+      pBtn.textContent = translate('paused');
+    }
     if(!lastRevealGif) lastRevealGif = pickRevealGifSafe();
     $('#qr').innerHTML=`<img src="${lastRevealGif}" style="width:256px;height:256px;border-radius:12px;object-fit:cover">`;
   }else if(stage==='playing'){
     $('#answer').style.display='none';
     $('#playRow').style.display='flex';
     $('#actionRow').style.display='none';
+    const pBtn = $('#pauseBtn');
+    if(pBtn){
+      pBtn.disabled = false;
+      pBtn.textContent = translate(paused ? 'resume' : 'pause');
+    }
     renderQR(words[currentWordIndex]);
     if(phase==='scan'){
       $('#qr').classList.add('scan-phase');
@@ -1261,6 +1417,7 @@ function startGame(){
   shuffleInPlace(words);
   $('#home').style.display='none';
   $('#gameArea').style.display='flex';
+  const lbStart=document.getElementById('leaderboard'); if(lbStart) lbStart.style.display='block';
   currentPlayer=0;currentWordIndex=0;usedWordsCount=0;
   phase='scan';paused=false;remainingScanSecs=Math.max(5, Math.min(60, Number(configuredScanSecs) || 20));remainingPlaySecs=170;
   stage='playing';
