@@ -126,14 +126,15 @@ button:active{transform:translateY(0) scale(.98)}
 #qr.scan-phase::after{
   content:attr(data-scan-label);
   position:absolute;
-  bottom:8px; left:50%;
+  bottom:4px; left:50%;
   transform:translateX(-50%);
   background:rgba(26,48,63,.92);
   border:1px solid var(--primary);
   color:#fff;
-  padding:.3rem .6rem;
+  padding:.2rem .5rem;
   border-radius:999px;
   font-weight:700;
+  font-size:clamp(10px, 2.8vw, 12px);
   text-shadow:0 0 8px var(--info);
   pointer-events:none;
 }
@@ -643,9 +644,29 @@ const STATE_KEY='boabed_game_state_v7';
 let words=[],defaultWords=['سيارة','ثلج','مطار','مفاجأة','قهوة','موسيقى','سفرة','روسيا','قطار','دب قطبي','كوب شاي','حديقة','فندق','متحف','كرة قدم','جسر','قمر','شمس','مطر','مسرح'],
     scores=[],teamScores=[],playerCount=0,teamCount=0,currentPlayer=0,currentWordIndex=0,geminiKey='',
     usedWordsCount=0,timerInterval=null,mode='individual',streak=[],hintUsed=false,stage='playing',
-    phase='scan',paused=false,remainingScanSecs=20,remainingPlaySecs=170;
+    phase='scan',paused=false,remainingScanSecs=20,remainingPlaySecs=170,
+    lastRevealGif='';
 
 const $=s=>document.querySelector(s);
+// Random reveal GIFs
+const REVEAL_GIFS=[
+  'https://media4.giphy.com/media/v1.Y2lkPTc5MGI3NjExdmVuM2x1N3dvYW1lZzRpOTNqN3N3YnM3OWVrNHZzdzJjYnR1cWhnOSZlcD12MV9naWZzX3RyZW5kaW5nJmN0PWc/fUQ4rhUZJYiQsas6WD/200.webp',
+  'https://media2.giphy.com/media/v1.Y2lkPTc5MGI3NjExamp0b3B3Y3VnNGo4ZnF0ZTZyOG0zZmlkNTdsZnAyYXN4Zm96em1pbCZlcD12MV9naWZzX3NlYXJjaCZjdD1n/mFdnWF1RTI7fi/200w.webp',
+  'https://media0.giphy.com/media/v1.Y2lkPWVjZjA1ZTQ3bzE3c3ZjeWxnaW9qZDZkNW1hYXdpZ2N3bXltaGIxYjhvZTZ6MWRsNSZlcD12MV9naWZzX3NlYXJjaCZjdD1n/88iYsvbegSUn9bSTF8/giphy.webp',
+  'https://media2.giphy.com/media/v1.Y2lkPWVjZjA1ZTQ3bzE3c3ZjeWxnaW9qZDZkNW1hYXdpZ2N3bXltaGIxYjhvZTZ6MWRsNSZlcD12MV9naWZzX3NlYXJjaCZjdD1n/ylyUQnn01Vh23qfq3m/200.webp',
+  'https://media2.giphy.com/media/v1.Y2lkPWVjZjA1ZTQ3cWQ1MDlmOWVtYm9vbzI2aW1uZmo1bWE5ZnRwZTQ2bXRwamFueXc4eSZlcD12MV9naWZzX3NlYXJjaCZjdD1n/Y9pvW54NNPRacOKg2D/200.webp',
+  'https://media2.giphy.com/media/v1.Y2lkPWVjZjA1ZTQ3dG5ua2Z3ZTM1c2w2N2c4emduMHdsZTNraHgyMjdsZWtzenZ4eWR2aiZlcD12MV9naWZzX3NlYXJjaCZjdD1n/Lk023zZqHJ3Zz4rxtV/giphy.webp',
+  'https://media4.giphy.com/media/v1.Y2lkPWVjZjA1ZTQ3eXQycXZsanc5MmlpZHh0OGRsc3Nub21xNzNuaWNsMzk3MHVqZWtuaiZlcD12MV9naWZzX3JlbGF0ZWQmY3Q9Zw/MCndepawQqgCs/giphy.webp',
+  'https://media1.giphy.com/media/v1.Y2lkPWVjZjA1ZTQ3ZWxuaXkwdzRhOHFtbXVtYnQwdmpheTVlOWhnYTliZmp6cTV1dHljYSZlcD12MV9naWZzX3JlbGF0ZWQmY3Q9Zw/DA8op0omzFuwe14iyj/giphy.webp',
+  'https://media4.giphy.com/media/v1.Y2lkPWVjZjA1ZTQ3djF3NjJtZjk0a3NsMmx2MHQwdW0wODFrYTFqcjJkMmJ3MXlvZTFpaSZlcD12MV9naWZzX3JlbGF0ZWQmY3Q9Zw/sC37EpvhNQ2GhXGwdc/giphy.webp',
+  'https://media4.giphy.com/media/v1.Y2lkPWVjZjA1ZTQ3djF3NjJtZjk0a3NsMmx2MHQwdW0wODFrYTFqcjJkMmJ3MXlvZTFpaSZlcD12MV9naWZzX3JlbGF0ZWQmY3Q9Zw/Q5Ra0QQUpPYdlFmFrj/200w.webp',
+  'https://media3.giphy.com/media/v1.Y2lkPTc5MGI3NjExbGtoNjFwOGtvMXBmZno1OHozbWl4aXJuNGc1MmlvdHV0dmVwNHZkayZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/PIEHvHyvDGZiMsN2Cb/giphy.gif',
+  'https://media4.giphy.com/media/v1.Y2lkPTc5MGI3NjExdGV0dmZlaDkwamphcjR4d29lMDdhYTVwbDFjdnBpaG1wMmVjcmF1dyZlcD12MV9naWZzX3NlYXJjaCZjdD1n/F1P5wA3Ai0jFAAWQFA/200.webp',
+  'https://media0.giphy.com/media/v1.Y2lkPTc5MGI3NjExdGV0dmZlaDkwamphcjR4d29lMDdhYTVwbDFjdnBpaG1wMmVjcmF1dyZlcD12MV9naWZzX3NlYXJjaCZjdD1n/10AmJ6TIlbYxAk/giphy.webp',
+  'https://media2.giphy.com/media/v1.Y2lkPWVjZjA1ZTQ3YjBjMDNic2FhaTdoZnU4NHBkcnJreWI5eW91bWFxa2lyM28xcXpoeCZlcD12MV9naWZzX3NlYXJjaCZjdD1n/mIZ9rPeMKefm0/giphy.webp',
+  'https://media2.giphy.com/media/v1.Y2lkPWVjZjA1ZTQ3dHZ5Z3VqajBlbW1kOXRmcDR0aXAzcmJ0aGM5em9hbnRwejZsZW5sciZlcD12MV9naWZzX3NlYXJjaCZjdD1n/atQF1zaSGq8s8/giphy.webp'
+];
+function pickRevealGif(){return REVEAL_GIFS[Math.floor(Math.random()*REVEAL_GIFS.length)];}
 function utf8Encode(str){return unescape(encodeURIComponent(str));}
 function renderQR(text){const qrBox=$('#qr');qrBox.innerHTML='';const qr=qrcode(0,'L');qr.addData(utf8Encode(text),'Byte');qr.make();qrBox.innerHTML=qr.createImgTag(6,0);}
 function cleanLines(text){
@@ -675,6 +696,7 @@ function saveState(){
     words,mode,playerCount,teamCount,scores,teamScores,currentPlayer,currentWordIndex,
     usedWordsCount,hintUsed,stage,currentLang,
     phase,paused,remainingScanSecs,remainingPlaySecs,
+    lastRevealGif,
     homeHidden:$('#home').style.display==='none',
     gameVisible:$('#gameArea').style.display==='flex'
   };
@@ -695,6 +717,7 @@ function loadState(){
     phase=st.phase||'scan';paused=!!st.paused;
     remainingScanSecs=st.remainingScanSecs ?? 20;
     remainingPlaySecs=st.remainingPlaySecs ?? 170;
+    lastRevealGif=st.lastRevealGif||'';
 
     if(st.currentLang) {
       currentLang = st.currentLang;
@@ -961,7 +984,8 @@ function reveal(){
   $('#answer').style.display='block';
   $('#playRow').style.display='none';
   $('#actionRow').style.display='flex';
-  $('#qr').innerHTML='<img src="https://media.giphy.com/media/du3J3cXyzhj75IOgvA/giphy.gif" style="width:256px;height:256px;border-radius:12px">';
+  lastRevealGif = pickRevealGif();
+  $('#qr').innerHTML=`<img src="${lastRevealGif}" style="width:256px;height:256px;border-radius:12px;object-fit:cover">`;
   clearInterval(timerInterval);
   stage='revealed';
   saveState()
@@ -1065,7 +1089,8 @@ function restoreTurn(){
     $('#answer').style.display='block';
     $('#playRow').style.display='none';
     $('#actionRow').style.display='flex';
-    $('#qr').innerHTML='<img src="https://media.giphy.com/media/du3J3cXyzhj75IOgvA/giphy.gif" style="width:256px;height:256px;border-radius:12px">';
+    if(!lastRevealGif) lastRevealGif = pickRevealGif();
+    $('#qr').innerHTML=`<img src="${lastRevealGif}" style="width:256px;height:256px;border-radius:12px;object-fit:cover">`;
   }else if(stage==='playing'){
     $('#answer').style.display='none';
     $('#playRow').style.display='flex';
