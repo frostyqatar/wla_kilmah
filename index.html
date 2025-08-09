@@ -647,6 +647,33 @@ if (savedLang && savedLang !== currentLang) {
 
 const bgm=document.getElementById('bgm');bgm.volume=0.15;
 
+// Default background rotation when no user-uploaded image exists
+const DEFAULT_BACKGROUNDS=[
+  'https://i.ibb.co/Y4LZLZBW/Chat-GPT-Image-Aug-2-2025-03-33-53-PM.png',
+  'https://i.ibb.co/yn0HDC7t/Copilot-20250809-132708.png',
+  
+  'https://i.ibb.co/1ftmgp0x/Copilot-20250809-132614.png',
+  'https://i.ibb.co/hxnvfQ02/Copilot-20250809-132532.png'
+];
+let bgRotationTimer=null,bgRotationIndex=0;
+const DEFAULT_BG_ROTATE_SECS=300; //This is where you modify the seconds to change it after testing
+function setDefaultBackground(index){
+  const url=DEFAULT_BACKGROUNDS[index % DEFAULT_BACKGROUNDS.length];
+  document.body.style.backgroundImage=`url('${url}')`;
+}
+function startDefaultBackgroundRotation(){
+  // Restore last index if present for continuity
+  const savedIdx=parseInt(localStorage.getItem('bgDefaultIdx')||'0',10);
+  if(!Number.isNaN(savedIdx)) bgRotationIndex=savedIdx % DEFAULT_BACKGROUNDS.length;
+  setDefaultBackground(bgRotationIndex);
+  clearInterval(bgRotationTimer);
+  bgRotationTimer=setInterval(()=>{
+    bgRotationIndex=(bgRotationIndex+1)%DEFAULT_BACKGROUNDS.length;
+    localStorage.setItem('bgDefaultIdx',String(bgRotationIndex));
+    setDefaultBackground(bgRotationIndex);
+  }, DEFAULT_BG_ROTATE_SECS*1000);
+}
+
 // State v7 with scan phase and pause
 const STATE_KEY='boabed_game_state_v7';
 let words=[],defaultWords=['سيارة','ثلج','مطار','مفاجأة','قهوة','موسيقى','سفرة','روسيا','قطار','دب قطبي','كوب شاي','حديقة','فندق','متحف','كرة قدم','جسر','قمر','شمس','مطر','مسرح'],
@@ -675,7 +702,13 @@ const REVEAL_GIFS=[
   'https://media2.giphy.com/media/v1.Y2lkPWVjZjA1ZTQ3YjBjMDNic2FhaTdoZnU4NHBkcnJreWI5eW91bWFxa2lyM28xcXpoeCZlcD12MV9naWZzX3NlYXJjaCZjdD1n/mIZ9rPeMKefm0/giphy.webp',
   'https://media2.giphy.com/media/v1.Y2lkPWVjZjA1ZTQ3dHZ5Z3VqajBlbW1kOXRmcDR0aXAzcmJ0aGM5em9hbnRwejZsZW5sciZlcD12MV9naWZzX3NlYXJjaCZjdD1n/atQF1zaSGq8s8/giphy.webp'
 ];
-function pickRevealGif(){return REVEAL_GIFS[Math.floor(Math.random()*REVEAL_GIFS.length)];}
+
+const preloaded = REVEAL_GIFS.map(u=>{ const i=new Image(); i.src=u; return i; });
+function pickRevealGifSafe(){
+  const u = REVEAL_GIFS[Math.floor(Math.random()*REVEAL_GIFS.length)];
+  return (preloaded.find(i=>i.src===u && i.complete) ? u : REVEAL_GIFS[0]);
+}
+
 function utf8Encode(str){return unescape(encodeURIComponent(str));}
 function renderQR(text){const qrBox=$('#qr');qrBox.innerHTML='';const qr=qrcode(0,'L');qr.addData(utf8Encode(text),'Byte');qr.make();qrBox.innerHTML=qr.createImgTag(6,0);}
 function cleanLines(text){
@@ -756,8 +789,12 @@ function updateGameUI() {
 }
 
 window.addEventListener('beforeunload',saveState);
-if(localStorage.getItem('bgImageData')){document.body.style.backgroundImage=`url('${localStorage.getItem('bgImageData')}')`}
-$('#bgUpload').addEventListener('change',e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=ev=>{const data=ev.target.result;document.body.style.backgroundImage=`url('${data}')`;localStorage.setItem('bgImageData',data)};r.readAsDataURL(f)});
+if(localStorage.getItem('bgImageData')){
+  document.body.style.backgroundImage=`url('${localStorage.getItem('bgImageData')}')`
+}else{
+  startDefaultBackgroundRotation();
+}
+$('#bgUpload').addEventListener('change',e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=ev=>{const data=ev.target.result;document.body.style.backgroundImage=`url('${data}')`;localStorage.setItem('bgImageData',data);if(bgRotationTimer){clearInterval(bgRotationTimer);bgRotationTimer=null;}};r.readAsDataURL(f)});
 
 const previewModal=$('#previewModal');
 function openPreview(list){$('#previewList').innerHTML='<ol>'+list.map(w=>`<li>${w}</li>`).join('')+'</ol>';previewModal.classList.add('active')}
@@ -998,7 +1035,7 @@ function reveal(){
   $('#answer').style.display='block';
   $('#playRow').style.display='none';
   $('#actionRow').style.display='flex';
-  lastRevealGif = pickRevealGif();
+  lastRevealGif = pickRevealGifSafe();
   $('#qr').innerHTML=`<img src="${lastRevealGif}" style="width:256px;height:256px;border-radius:12px;object-fit:cover">`;
   clearInterval(timerInterval);
   stage='revealed';
@@ -1103,7 +1140,7 @@ function restoreTurn(){
     $('#answer').style.display='block';
     $('#playRow').style.display='none';
     $('#actionRow').style.display='flex';
-    if(!lastRevealGif) lastRevealGif = pickRevealGif();
+    if(!lastRevealGif) lastRevealGif = pickRevealGifSafe();
     $('#qr').innerHTML=`<img src="${lastRevealGif}" style="width:256px;height:256px;border-radius:12px;object-fit:cover">`;
   }else if(stage==='playing'){
     $('#answer').style.display='none';
@@ -1201,9 +1238,17 @@ function startGame(){
     if(confirm(translate('no_word_list'))){words=[...defaultWords];updateHomeStats()}
     else{toast(translate('setup_first'),'warn');return}
   }
-  // Ensure player/team arrays
-  if(mode==='individual'&&playerCount<=0){playerCount=3;scores=new Array(playerCount).fill(0);streak=new Array(playerCount).fill(0)}
-  if(mode==='team'&&playerCount<=0){playerCount=2;teamScores=new Array(playerCount).fill(0);streak=new Array(playerCount).fill(0)}
+  // Initialize/Reset player/team arrays (keep words unchanged)
+  if(mode==='individual'){
+    if(playerCount<=0){playerCount=3;}
+    scores = new Array(playerCount).fill(0);
+    teamScores = [];
+  }else{
+    if(playerCount<=0){playerCount=2;}
+    teamScores = new Array(playerCount).fill(0);
+    scores = [];
+  }
+  streak = new Array(playerCount).fill(0);
   // Shuffle list at game start
   shuffleInPlace(words);
   $('#home').style.display='none';
@@ -1211,6 +1256,8 @@ function startGame(){
   currentPlayer=0;currentWordIndex=0;usedWordsCount=0;
   phase='scan';paused=false;remainingScanSecs=Math.max(5, Math.min(60, Number(configuredScanSecs) || 20));remainingPlaySecs=170;
   stage='playing';
+  // Clear any previous achievement toasts/badges
+  const achBox = document.getElementById('achievements'); if(achBox) achBox.innerHTML='';
   buildScoreboard();showTurn();saveState()
 }
 
