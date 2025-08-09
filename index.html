@@ -653,10 +653,17 @@ const DEFAULT_BACKGROUNDS=[
   'https://i.ibb.co/yn0HDC7t/Copilot-20250809-132708.png',
   
   'https://i.ibb.co/1ftmgp0x/Copilot-20250809-132614.png',
-  'https://i.ibb.co/hxnvfQ02/Copilot-20250809-132532.png'
+  'https://i.ibb.co/hxnvfQ02/Copilot-20250809-132532.png', 
+  'https://i.ibb.co/9kYj1Q2p/BCO-3e5d8451-73d4-47e0-a130-ed9dddd14663.png',
+  'https://i.ibb.co/yn0HDC7t/Copilot-20250809-132708.png',
+  'https://i.ibb.co/RpVXfvNh/BCO-e88a3999-94b0-4d10-8580-40b4c8596d47.png',
+  'https://i.ibb.co/hxnvfQ02/Copilot-20250809-132532.png',
+  'https://i.ibb.co/zhzqwzPQ/BCO-3a07ada7-d526-41e8-96a7-58ae92e8c887.png',
+  'https://i.ibb.co/yn0HDC7t/Copilot-20250809-132708.png',
+  'https://i.ibb.co/rGSRpxCC/BCO-a60f9c50-e81c-4c79-a040-1bbd352fbd77.png'
 ];
 let bgRotationTimer=null,bgRotationIndex=0;
-const DEFAULT_BG_ROTATE_SECS=300; //This is where you modify the seconds to change it after testing
+const DEFAULT_BG_ROTATE_SECS=160; //This is where you modify the seconds to change it after testing
 function setDefaultBackground(index){
   const url=DEFAULT_BACKGROUNDS[index % DEFAULT_BACKGROUNDS.length];
   document.body.style.backgroundImage=`url('${url}')`;
