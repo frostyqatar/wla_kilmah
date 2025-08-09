@@ -414,6 +414,14 @@ button:active{transform:translateY(0) scale(.98)}
           <div class="input"><label><input type="checkbox" id="muteOnStart"> <span data-ar="كتم الصوت عند البدء" data-en="Mute sound on start">كتم الصوت عند البدء</span></label></div>
           <p class="small" data-ar="يمكنك دائماً تغييره من زر الكتم." data-en="You can always change it with the mute button.">يمكنك دائماً تغييره من زر الكتم.</p>
         </div>
+        <div class="card">
+          <h4 data-ar="إعدادات الوقت" data-en="Time Settings">إعدادات الوقت</h4>
+          <div class="input">
+            <label for="scanSecsInput" data-ar="مدة المسح (ثوانٍ)" data-en="Scan duration (seconds)">مدة المسح (ثوانٍ)</label>
+            <input type="number" id="scanSecsInput" min="5" max="60" value="20">
+          </div>
+          <p class="small" data-ar="النطاق المسموح: 5–60 ثانية" data-en="Allowed range: 5–60 seconds">النطاق المسموح: 5–60 ثانية</p>
+        </div>
       </div>
       <div class="actions">
         <button id="toStep2" data-ar="التالي" data-en="Next">التالي</button>
@@ -527,7 +535,7 @@ const translations = {
     'new_game_start': 'لعبة جديدة بدأت!',
     'winner': 'الفائز',
     'scan_qr': 'قم بمسح رمز QR',
-    'scan_free': '⏳ أول 20 ثانية مجانية للمسح',
+    'scan_free': 'امسح الرمز',
     'pause': 'إيقاف مؤقت',
     'resume': 'استئناف',
     'paused': 'متوقف مؤقتًا',
@@ -646,6 +654,8 @@ let words=[],defaultWords=['سيارة','ثلج','مطار','مفاجأة','قه
     usedWordsCount=0,timerInterval=null,mode='individual',streak=[],hintUsed=false,stage='playing',
     phase='scan',paused=false,remainingScanSecs=20,remainingPlaySecs=170,
     lastRevealGif='';
+// Configurable scan duration (seconds)
+let configuredScanSecs = 20;
 
 const $=s=>document.querySelector(s);
 // Random reveal GIFs
@@ -661,7 +671,6 @@ const REVEAL_GIFS=[
   'https://media4.giphy.com/media/v1.Y2lkPWVjZjA1ZTQ3djF3NjJtZjk0a3NsMmx2MHQwdW0wODFrYTFqcjJkMmJ3MXlvZTFpaSZlcD12MV9naWZzX3JlbGF0ZWQmY3Q9Zw/sC37EpvhNQ2GhXGwdc/giphy.webp',
   'https://media4.giphy.com/media/v1.Y2lkPWVjZjA1ZTQ3djF3NjJtZjk0a3NsMmx2MHQwdW0wODFrYTFqcjJkMmJ3MXlvZTFpaSZlcD12MV9naWZzX3JlbGF0ZWQmY3Q9Zw/Q5Ra0QQUpPYdlFmFrj/200w.webp',
   'https://media3.giphy.com/media/v1.Y2lkPTc5MGI3NjExbGtoNjFwOGtvMXBmZno1OHozbWl4aXJuNGc1MmlvdHV0dmVwNHZkayZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/PIEHvHyvDGZiMsN2Cb/giphy.gif',
-  'https://media4.giphy.com/media/v1.Y2lkPTc5MGI3NjExdGV0dmZlaDkwamphcjR4d29lMDdhYTVwbDFjdnBpaG1wMmVjcmF1dyZlcD12MV9naWZzX3NlYXJjaCZjdD1n/F1P5wA3Ai0jFAAWQFA/200.webp',
   'https://media0.giphy.com/media/v1.Y2lkPTc5MGI3NjExdGV0dmZlaDkwamphcjR4d29lMDdhYTVwbDFjdnBpaG1wMmVjcmF1dyZlcD12MV9naWZzX3NlYXJjaCZjdD1n/10AmJ6TIlbYxAk/giphy.webp',
   'https://media2.giphy.com/media/v1.Y2lkPWVjZjA1ZTQ3YjBjMDNic2FhaTdoZnU4NHBkcnJreWI5eW91bWFxa2lyM28xcXpoeCZlcD12MV9naWZzX3NlYXJjaCZjdD1n/mIZ9rPeMKefm0/giphy.webp',
   'https://media2.giphy.com/media/v1.Y2lkPWVjZjA1ZTQ3dHZ5Z3VqajBlbW1kOXRmcDR0aXAzcmJ0aGM5em9hbnRwejZsZW5sciZlcD12MV9naWZzX3NlYXJjaCZjdD1n/atQF1zaSGq8s8/giphy.webp'
@@ -696,6 +705,7 @@ function saveState(){
     words,mode,playerCount,teamCount,scores,teamScores,currentPlayer,currentWordIndex,
     usedWordsCount,hintUsed,stage,currentLang,
     phase,paused,remainingScanSecs,remainingPlaySecs,
+    configuredScanSecs,
     lastRevealGif,
     homeHidden:$('#home').style.display==='none',
     gameVisible:$('#gameArea').style.display==='flex'
@@ -717,6 +727,7 @@ function loadState(){
     phase=st.phase||'scan';paused=!!st.paused;
     remainingScanSecs=st.remainingScanSecs ?? 20;
     remainingPlaySecs=st.remainingPlaySecs ?? 170;
+    configuredScanSecs = st.configuredScanSecs ?? 20;
     lastRevealGif=st.lastRevealGif||'';
 
     if(st.currentLang) {
@@ -756,7 +767,7 @@ $('#closePreview').onclick=()=>previewModal.classList.remove('active')
 const setupModal=$('#setupModal');
 const closeSetup=document.getElementById('closeSetup');
 if(closeSetup){closeSetup.onclick=()=>setupModal.classList.remove('active');}
-$('#setupBtn').onclick=()=>{updateCurrentCount();setStep(1);setupModal.classList.add('active')}
+$('#setupBtn').onclick=()=>{updateCurrentCount();setStep(1);const si=document.getElementById('scanSecsInput');if(si){si.value = configuredScanSecs;}setupModal.classList.add('active')}
 function setStep(n){['s1','s2','s3'].forEach((id,i)=>{$('#'+id).classList.toggle('active',i===n-1)});['step1','step2','step3'].forEach((id,i)=>{$('#'+id).style.display=(i===n-1)?'block':'none'})}
 Array.from(document.querySelectorAll('input[name="mode"]')).forEach(r=>r.onchange=()=>{mode=r.value;$('#modeBadge').querySelector('span').textContent=translate(mode==='individual'?'mode_individual':'mode_team');$('#individualInputs').style.display=(mode==='individual')?'block':'none';$('#teamInputs').style.display=(mode==='team')?'block':'none';});
 $('#toStep2').onclick=()=>setStep(2);
@@ -857,6 +868,9 @@ $('#confirmSetup').onclick=()=>{
     teamScores=new Array(playerCount).fill(0);
     streak=new Array(playerCount).fill(0)
   }
+  // Save configured scan seconds
+  const scanInput=document.getElementById('scanSecsInput');
+  if(scanInput){ configuredScanSecs = Math.max(5, Math.min(60, parseInt(scanInput.value)||20)); }
   setupModal.classList.remove('active');
   toast(translate('setup_ready'),'success');
   if($('#muteOnStart').checked){bgm.pause()}else{bgm.play()}
@@ -911,7 +925,7 @@ function tickTimer(){
 
 function startScanPhase(){
   phase='scan'; paused=false;
-  remainingScanSecs=20;
+  remainingScanSecs = Math.max(5, Math.min(60, Number(configuredScanSecs) || 20));
   $('#qr').classList.add('scan-phase');
   $('#qr').setAttribute('data-scan-label', translate('scan_qr'));
   $('#revealBtn').disabled = true;
@@ -973,7 +987,7 @@ function showTurn(){
   const special=((usedWordsCount+1)%5===0);
   $('#qr').classList.toggle('special',special);
   renderQR(words[currentWordIndex]);
-  startScanPhase(); // 20s free scan, then 2:50 play
+  startScanPhase();
   highlightActive();
   stage='playing';
   saveState()
@@ -1195,7 +1209,7 @@ function startGame(){
   $('#home').style.display='none';
   $('#gameArea').style.display='flex';
   currentPlayer=0;currentWordIndex=0;usedWordsCount=0;
-  phase='scan';paused=false;remainingScanSecs=20;remainingPlaySecs=170;
+  phase='scan';paused=false;remainingScanSecs=Math.max(5, Math.min(60, Number(configuredScanSecs) || 20));remainingPlaySecs=170;
   stage='playing';
   buildScoreboard();showTurn();saveState()
 }
