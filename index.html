@@ -649,7 +649,7 @@ const bgm=document.getElementById('bgm');bgm.volume=0.15;
 
 // Default background rotation when no user-uploaded image exists
 const DEFAULT_BACKGROUNDS=[
-  'https://i.ibb.co/Y4LZLZBW/Chat-GPT-Image-Aug-2-2025-03-33-53-PM.png',
+  'https://i.ibb.co/Z6J0Dm6J/BCO-f98abff2-0b9a-4513-adb7-b06f0b31c6cc.png',
   'https://i.ibb.co/yn0HDC7t/Copilot-20250809-132708.png',
   
   'https://i.ibb.co/1ftmgp0x/Copilot-20250809-132614.png',
@@ -663,7 +663,7 @@ const DEFAULT_BACKGROUNDS=[
   'https://i.ibb.co/rGSRpxCC/BCO-a60f9c50-e81c-4c79-a040-1bbd352fbd77.png'
 ];
 let bgRotationTimer=null,bgRotationIndex=0;
-const DEFAULT_BG_ROTATE_SECS=160; //This is where you modify the seconds to change it after testing
+const DEFAULT_BG_ROTATE_SECS=180; //This is where you modify the seconds to change it after testing
 function setDefaultBackground(index){
   const url=DEFAULT_BACKGROUNDS[index % DEFAULT_BACKGROUNDS.length];
   document.body.style.backgroundImage=`url('${url}')`;
