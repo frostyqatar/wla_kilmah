@@ -39,7 +39,7 @@ button:active{transform:translateY(0) scale(.98)}
 
 .badge{display:inline-flex;align-items:center;gap:.35rem;padding:.4rem .8rem;background:var(--secondary);border-radius:999px;font-size:.85rem;border:1px solid var(--primary)}
 
-.hero{position:relative;display:flex;align-items:center;justify-content:center;min-height:100vh;padding:2rem}
+.hero{position:relative;display:flex;align-items:center;justify-content:center;min-height:100vh;padding:2rem;z-index:2}
 .hero .card{position:relative;background:var(--glass);backdrop-filter:blur(12px);border:2px solid var(--primary);border-radius:20px;padding:2rem;width:min(92vw,720px);box-shadow:0 20px 40px rgba(6,24,38,.6);margin:0 auto}
 
 /* Enhanced Title with Much Slower Pulse */
@@ -104,7 +104,132 @@ button:active{transform:translateY(0) scale(.98)}
 /* Language Toggle */
 .lang-toggle{position:fixed;top:20px;right:20px;z-index:1000;background:var(--warning);color:#fff;padding:.5rem 1rem;border-radius:8px;font-size:.9rem;border:none;font-weight:600}
 
-.spark{position:fixed;inset:0;background:radial-gradient(600px 300px at 10% 10%,rgba(96,125,126,.12),transparent 60%),radial-gradient(500px 260px at 90% 20%,rgba(43,80,92,.12),transparent 60%),radial-gradient(500px 260px at 50% 100%,rgba(26,48,63,.12),transparent 60%);pointer-events:none}
+.spark{position:fixed;inset:0;background:radial-gradient(600px 300px at 10% 10%,rgba(96,125,126,.12),transparent 60%),radial-gradient(500px 260px at 90% 20%,rgba(43,80,92,.12),transparent 60%),radial-gradient(500px 260px at 50% 100%,rgba(26,48,63,.12),transparent 60%);pointer-events:none;z-index:0}
+
+/* Global Aurora + Starry Background Overlay using body pseudo-elements
+   Ensures overlay is ABOVE the background image but BELOW all UI */
+body::before{
+  content:''; position:fixed; inset:-20%; pointer-events:none; z-index:1;
+  background:
+    radial-gradient(140% 70% at 10% 0%, rgba(59,130,246,.30), transparent 60%),
+    radial-gradient(120% 60% at 90% 5%, rgba(34,197,94,.26), transparent 60%),
+    radial-gradient(160% 80% at 50% 110%, rgba(236,72,153,.24), transparent 60%);
+  filter: blur(20px) saturate(1.2);
+  animation: auroraShift 11s linear infinite;
+  mix-blend-mode: screen;
+}
+body::after{
+  content:''; position:fixed; inset:0; pointer-events:none; z-index:1; opacity:2;
+  mix-blend-mode: screen; will-change: transform;
+  /* 72 randomly placed star points with subtle size/opacity variance */
+  background-image:
+    radial-gradient(10.0px 10px at 4% 12%, rgba(255,255,255,0.95) 45%, transparent 52%),
+    radial-gradient(2.4px 2.4px at 9% 28%, rgba(255,255,255,0.90) 45%, transparent 52%),
+    radial-gradient(2.0px 2.0px at 15% 6%, rgba(255,255,255,0.85) 45%, transparent 52%),
+    radial-gradient(2.6px 2.6px at 21% 18%, rgba(255,255,255,0.95) 45%, transparent 52%),
+    radial-gradient(2.2px 2.2px at 27% 10%, rgba(255,255,255,0.88) 45%, transparent 52%),
+    radial-gradient(2.8px 2.8px at 33% 4%, rgba(255,255,255,0.92) 45%, transparent 52%),
+    radial-gradient(2.6px 2.6px at 39% 14%, rgba(255,255,255,0.90) 45%, transparent 52%),
+    radial-gradient(3.2px 3.2px at 45% 7%, rgba(255,255,255,0.96) 45%, transparent 52%),
+    radial-gradient(2.4px 2.4px at 51% 11%, rgba(255,255,255,0.88) 45%, transparent 52%),
+    radial-gradient(2.0px 2.0px at 57% 5%, rgba(255,255,255,0.84) 45%, transparent 52%),
+    radial-gradient(2.4px 2.4px at 63% 9%, rgba(255,255,255,0.92) 45%, transparent 52%),
+    radial-gradient(10.0px 10px at 4% 12%, rgba(255,255,255,0.95) 45%, transparent 52%),
+    radial-gradient(2.2px 2.2px at 69% 3%, rgba(255,255,255,0.86) 45%, transparent 52%),
+    radial-gradient(2.8px 2.8px at 75% 8%, rgba(255,255,255,0.93) 45%, transparent 52%),
+    radial-gradient(2.6px 2.6px at 81% 2%, rgba(255,255,255,0.90) 45%, transparent 52%),
+    radial-gradient(3.0px 3.0px at 87% 6%, rgba(255,255,255,0.95) 45%, transparent 52%),
+    radial-gradient(2.2px 2.2px at 93% 4%, rgba(255,255,255,0.86) 45%, transparent 52%),
+    radial-gradient(2.4px 2.4px at 2% 24%, rgba(255,255,255,0.90) 45%, transparent 52%),
+    radial-gradient(2.0px 2.0px at 8% 32%, rgba(255,255,255,0.84) 45%, transparent 52%),
+    radial-gradient(2.8px 2.8px at 14% 26%, rgba(255,255,255,0.93) 45%, transparent 52%),
+    radial-gradient(2.4px 2.4px at 20% 34%, rgba(255,255,255,0.90) 45%, transparent 52%),
+    radial-gradient(2.6px 2.6px at 26% 22%, rgba(255,255,255,0.92) 45%, transparent 52%),
+    radial-gradient(10.0px 10px at 84% 12%, rgba(255,255,255,0.95) 45%, transparent 52%),
+    radial-gradient(3.0px 3.0px at 32% 28%, rgba(255,255,255,0.96) 45%, transparent 52%),
+    radial-gradient(2.2px 2.2px at 38% 20%, rgba(255,255,255,0.86) 45%, transparent 52%),
+    radial-gradient(2.4px 2.4px at 44% 31%, rgba(255,255,255,0.90) 45%, transparent 52%),
+    radial-gradient(2.0px 2.0px at 50% 24%, rgba(255,255,255,0.84) 45%, transparent 52%),
+    radial-gradient(2.8px 2.8px at 56% 30%, rgba(255,255,255,0.93) 45%, transparent 52%),
+    radial-gradient(2.6px 2.6px at 62% 22%, rgba(255,255,255,0.90) 45%, transparent 52%),
+    radial-gradient(10.0px 10px at 54% 50%, rgba(255,255,255,0.95) 45%, transparent 52%),
+    radial-gradient(3.2px 3.2px at 68% 34%, rgba(255,255,255,0.97) 45%, transparent 52%),
+    radial-gradient(2.4px 2.4px at 74% 26%, rgba(255,255,255,0.90) 45%, transparent 52%),
+    radial-gradient(2.2px 2.2px at 80% 32%, rgba(255,255,255,0.88) 45%, transparent 52%),
+    radial-gradient(2.8px 2.8px at 86% 28%, rgba(255,255,255,0.92) 45%, transparent 52%),
+    radial-gradient(2.4px 2.4px at 92% 22%, rgba(255,255,255,0.90) 45%, transparent 52%),
+    radial-gradient(2.0px 2.0px at 65% 44%, rgba(255,255,255,0.84) 45%, transparent 52%),
+    radial-gradient(2.6px 2.6px at 12% 40%, rgba(255,255,255,0.92) 45%, transparent 52%),
+    radial-gradient(3.0px 3.0px at 18% 48%, rgba(255,255,255,0.95) 45%, transparent 52%),
+    radial-gradient(2.2px 2.2px at 24% 42%, rgba(255,255,255,0.86) 45%, transparent 52%),
+    radial-gradient(2.4px 2.4px at 30% 50%, rgba(255,255,255,0.90) 45%, transparent 52%),
+    radial-gradient(2.0px 2.0px at 36% 46%, rgba(255,255,255,0.84) 45%, transparent 52%),
+    radial-gradient(2.8px 2.8px at 42% 52%, rgba(255,255,255,0.93) 45%, transparent 52%),
+    radial-gradient(2.6px 2.6px at 48% 40%, rgba(255,255,255,0.90) 45%, transparent 52%),
+    radial-gradient(10.0px 10px at 24% 74%, rgba(255,255,255,0.95) 45%, transparent 52%),
+    radial-gradient(3.2px 3.2px at 54% 54%, rgba(255,255,255,0.97) 45%, transparent 52%),
+    radial-gradient(2.4px 2.4px at 60% 48%, rgba(255,255,255,0.90) 45%, transparent 52%),
+    radial-gradient(2.2px 2.2px at 66% 44%, rgba(255,255,255,0.88) 45%, transparent 52%),
+    radial-gradient(2.8px 2.8px at 72% 52%, rgba(255,255,255,0.92) 45%, transparent 52%),
+    radial-gradient(2.4px 2.4px at 78% 46%, rgba(255,255,255,0.90) 45%, transparent 52%),
+    radial-gradient(2.0px 2.0px at 84% 50%, rgba(255,255,255,0.84) 45%, transparent 52%),
+    radial-gradient(2.6px 2.6px at 90% 44%, rgba(255,255,255,0.92) 45%, transparent 52%),
+    radial-gradient(3.0px 3.0px at 96% 48%, rgba(255,255,255,0.95) 45%, transparent 52%),
+    radial-gradient(2.2px 2.2px at 4% 62%, rgba(255,255,255,0.86) 45%, transparent 52%),
+    radial-gradient(2.4px 2.4px at 10% 70%, rgba(255,255,255,0.90) 45%, transparent 52%),
+    radial-gradient(2.0px 2.0px at 16% 64%, rgba(255,255,255,0.84) 45%, transparent 52%),
+    radial-gradient(2.8px 2.8px at 22% 72%, rgba(255,255,255,0.93) 45%, transparent 52%),
+    radial-gradient(2.6px 2.6px at 28% 60%, rgba(255,255,255,0.90) 45%, transparent 52%),
+    radial-gradient(3.2px 3.2px at 34% 76%, rgba(255,255,255,0.97) 45%, transparent 52%),
+    radial-gradient(2.4px 2.4px at 40% 68%, rgba(255,255,255,0.90) 45%, transparent 52%),
+    radial-gradient(2.2px 2.2px at 46% 74%, rgba(255,255,255,0.88) 45%, transparent 52%),
+    radial-gradient(2.8px 2.8px at 52% 66%, rgba(255,255,255,0.92) 45%, transparent 52%),
+    radial-gradient(2.4px 2.4px at 58% 72%, rgba(255,255,255,0.90) 45%, transparent 52%),
+    radial-gradient(2.0px 2.0px at 64% 64%, rgba(255,255,255,0.84) 45%, transparent 52%),
+    radial-gradient(2.6px 2.6px at 70% 78%, rgba(255,255,255,0.92) 45%, transparent 52%),
+    radial-gradient(3.0px 3.0px at 76% 70%, rgba(255,255,255,0.95) 45%, transparent 52%),
+    radial-gradient(2.2px 2.2px at 82% 76%, rgba(255,255,255,0.86) 45%, transparent 52%),
+    radial-gradient(2.4px 2.4px at 88% 68%, rgba(255,255,255,0.90) 45%, transparent 52%),
+    radial-gradient(2.0px 2.0px at 94% 74%, rgba(255,255,255,0.84) 45%, transparent 52%),
+    radial-gradient(2.8px 2.8px at 6% 86%, rgba(255,255,255,0.93) 45%, transparent 52%),
+    radial-gradient(2.6px 2.6px at 12% 90%, rgba(255,255,255,0.90) 45%, transparent 52%),
+    radial-gradient(3.2px 3.2px at 18% 82%, rgba(255,255,255,0.97) 45%, transparent 52%),
+    radial-gradient(2.4px 2.4px at 24% 94%, rgba(255,255,255,0.90) 45%, transparent 52%),
+    radial-gradient(2.2px 2.2px at 30% 88%, rgba(255,255,255,0.88) 45%, transparent 52%),
+    radial-gradient(2.8px 2.8px at 36% 84%, rgba(255,255,255,0.92) 45%, transparent 52%),
+    radial-gradient(2.4px 2.4px at 42% 92%, rgba(255,255,255,0.90) 45%, transparent 52%),
+    radial-gradient(2.0px 2.0px at 48% 86%, rgba(255,255,255,0.84) 45%, transparent 52%),
+    radial-gradient(2.6px 2.6px at 54% 94%, rgba(255,255,255,0.92) 45%, transparent 52%),
+    radial-gradient(3.0px 3.0px at 60% 88%, rgba(255,255,255,0.95) 45%, transparent 52%),
+    radial-gradient(2.2px 2.2px at 66% 92%, rgba(255,255,255,0.86) 45%, transparent 52%),
+    radial-gradient(2.4px 2.4px at 72% 86%, rgba(255,255,255,0.90) 45%, transparent 52%),
+    radial-gradient(2.0px 2.0px at 78% 94%, rgba(255,255,255,0.84) 45%, transparent 52%),
+    radial-gradient(2.8px 2.8px at 84% 90%, rgba(255,255,255,0.93) 45%, transparent 52%),
+    radial-gradient(2.6px 2.6px at 90% 84%, rgba(255,255,255,0.90) 45%, transparent 52%),
+    radial-gradient(3.2px 3.2px at 96% 92%, rgba(255,255,255,0.97) 45%, transparent 52%),
+    radial-gradient(2.4px 2.4px at 3% 56%, rgba(255,255,255,0.90) 45%, transparent 52%),
+    radial-gradient(2.2px 2.2px at 13% 57%, rgba(255,255,255,0.88) 45%, transparent 52%),
+    radial-gradient(2.0px 2.0px at 23% 58%, rgba(255,255,255,0.84) 45%, transparent 52%),
+    radial-gradient(2.6px 2.6px at 33% 59%, rgba(255,255,255,0.92) 45%, transparent 52%),
+    radial-gradient(2.4px 2.4px at 43% 60%, rgba(255,255,255,0.90) 45%, transparent 52%),
+    radial-gradient(2.2px 2.2px at 53% 61%, rgba(255,255,255,0.88) 45%, transparent 52%),
+    radial-gradient(2.8px 2.8px at 63% 62%, rgba(255,255,255,0.93) 45%, transparent 52%),
+    radial-gradient(2.6px 2.6px at 73% 63%, rgba(255,255,255,0.90) 45%, transparent 52%),
+    radial-gradient(3.0px 3.0px at 83% 64%, rgba(255,255,255,0.95) 45%, transparent 52%),
+    radial-gradient(2.4px 2.4px at 93% 65%, rgba(255,255,255,0.90) 45%, transparent 52%);
+  filter: brightness(2) drop-shadow(0 0 10px rgba(255,255,255,.85)) drop-shadow(0 0 22px rgba(255,255,255,.55));
+  animation: twinkle 2.1s steps(2) infinite, starDrift 18s linear infinite;
+}
+
+/* Emphasize Start button with golden outline glow like leaderboard */
+#startBtn{
+  border:2px solid var(--gold);
+  box-shadow:0 0 20px var(--gold), 0 0 40px rgba(255,215,0,.3);
+  animation:goldenGlow 2s infinite ease-in-out;
+}
+#startBtn:hover{
+  box-shadow:0 0 30px var(--gold), 0 0 60px rgba(255,215,0,.5);
+}
 
 #gameArea{display:none;flex-direction:column;align-items:center;gap:1rem;background:rgba(6,24,38,.8);padding:1.5rem;border-radius:16px;backdrop-filter:blur(8px);width:min(92vw,560px);margin:2rem auto;border:2px solid var(--primary)}
 .row{display:flex;gap:.6rem;align-items:center;justify-content:center;flex-wrap:wrap}
@@ -228,7 +353,7 @@ button:active{transform:translateY(0) scale(.98)}
 
 /* Right-floating leaderboard that doesn't affect center alignment */
 #gameArea{position:relative; z-index:10}
-#leaderboard{position:fixed; inset-inline-end: min(2vw, 20px); top: 120px; width: 280px; background:var(--secondary); border:2px solid var(--primary); border-radius:14px; padding:.8rem; min-width:260px; display:none}
+#leaderboard{position:fixed; inset-inline-end: min(2vw, 20px); top: 120px; width: 280px; background:var(--secondary); border:2px solid var(--primary); border-radius:14px; padding:.8rem; min-width:260px; display:none; z-index:20}
 .leaderboard-title{font-weight:800; color:#fff; text-align:center; margin-bottom:.4rem; letter-spacing:.5px}
 .leaderboard-list{display:flex; flex-direction:column; gap:.5rem; position:relative}
 .lb-item{display:flex; align-items:center; justify-content:space-between; gap:.6rem; padding:.55rem .7rem; border:1px solid var(--primary); border-radius:12px; background:rgba(6,24,38,.6); transform:translateY(0); transition:transform .35s ease, box-shadow .35s ease}
@@ -387,8 +512,11 @@ button:active{transform:translateY(0) scale(.98)}
 <body>
 <button class="lang-toggle" id="langToggle">English</button>
 
+<!-- Global Aurora + Starry overlay above background image -->
+<div class="bg-aurora" aria-hidden="true"></div>
+
 <section class="hero" id="home">
-  <div class="spark"></div>
+  <div class="spark" aria-hidden="true"></div>
   <div class="card">
     <div class="title" data-ar="ولا كلمة عالسريع" data-en="Quick Charades">ولا كلمة عالسريع</div>
     <div class="hero-grid">
