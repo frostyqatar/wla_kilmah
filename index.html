@@ -855,24 +855,77 @@ const DEFAULT_BACKGROUNDS=[
   'https://i.ibb.co/1ftmgp0x/Copilot-20250809-132614.png',
   'https://i.ibb.co/hxnvfQ02/Copilot-20250809-132532.png', 
   'https://i.ibb.co/9kYj1Q2p/BCO-3e5d8451-73d4-47e0-a130-ed9dddd14663.png',
-  'https://i.ibb.co/whs1z646/Copilot-20250810-010045.png',
+  'https://i.ibb.co/GvznwHwr/Copilot-20250810-095615.png',
   'https://i.ibb.co/RpVXfvNh/BCO-e88a3999-94b0-4d10-8580-40b4c8596d47.png',
   'https://i.ibb.co/NXVrQZv/Copilot-20250810-010821.png',
   'https://i.ibb.co/zhzqwzPQ/BCO-3a07ada7-d526-41e8-96a7-58ae92e8c887.png',
   'https://i.ibb.co/TxLhQCqm/Copilot-20250810-010312.png',
   'https://i.ibb.co/rGSRpxCC/BCO-a60f9c50-e81c-4c79-a040-1bbd352fbd77.png',
-  'https://i.ibb.co/nqqQH5LF/Copilot-20250810-011000.png'
+  'https://i.ibb.co/nqqQH5LF/Copilot-20250810-011000.png',
+  'https://i.ibb.co/WW99PrKN/Copilot-20250810-095627.png',
+  'https://i.ibb.co/PsF1w4pj/Copilot-20250810-101400.png'
 ];
 let bgRotationTimer=null,bgRotationIndex=0;
-const DEFAULT_BG_ROTATE_SECS=180; //This is where you modify the seconds to change it after testing
+const DEFAULT_BG_ROTATE_SECS=160; //This is where you modify the seconds to change it after testing
+
+// Preload cache to avoid flicker between background swaps
+const BG_LOAD_STATE = new Map(); // url -> 'loaded' | 'error' | 'loading'
+function preloadBg(url){
+  if(BG_LOAD_STATE.get(url)==='loaded' || BG_LOAD_STATE.get(url)==='loading') return;
+  BG_LOAD_STATE.set(url,'loading');
+  const img=new Image();
+  img.onload=()=>{ BG_LOAD_STATE.set(url,'loaded'); };
+  img.onerror=()=>{ BG_LOAD_STATE.set(url,'error'); };
+  img.src=url;
+}
+function warmPreloadNeighbors(index){
+  const len = DEFAULT_BACKGROUNDS.length;
+  for(let k=1;k<=2;k++){
+    const u = DEFAULT_BACKGROUNDS[(index+k)%len];
+    preloadBg(u);
+  }
+}
 function setDefaultBackground(index){
-  const url=DEFAULT_BACKGROUNDS[index % DEFAULT_BACKGROUNDS.length];
-  document.body.style.backgroundImage=`url('${url}')`;
+  const len = DEFAULT_BACKGROUNDS.length;
+  const url=DEFAULT_BACKGROUNDS[index % len];
+  const state = BG_LOAD_STATE.get(url);
+  if(state==='loaded'){
+    document.body.style.backgroundImage=`url('${url}')`;
+  }else if(state==='loading'){
+    // Defer swap until it finishes loading; keep current image to avoid black flash
+    // Attach a one-time poller to apply when ready
+    let tries=0;
+    const check=()=>{
+      if(BG_LOAD_STATE.get(url)==='loaded'){
+        document.body.style.backgroundImage=`url('${url}')`;
+      }else if(tries<30){ // up to ~3s
+        tries++; setTimeout(check,100);
+      }
+    };
+    setTimeout(check,120);
+  }else{
+    // Not started yet; start preload then swap when done
+    const img=new Image();
+    BG_LOAD_STATE.set(url,'loading');
+    img.onload=()=>{ BG_LOAD_STATE.set(url,'loaded');
+      // Only swap if this index is still current to avoid race when user advanced
+      if((bgRotationIndex % len)=== (index % len)){
+        document.body.style.backgroundImage=`url('${url}')`;
+      }
+    };
+    img.onerror=()=>{ BG_LOAD_STATE.set(url,'error'); };
+    img.src=url;
+  }
+  // Warm preload upcoming images
+  warmPreloadNeighbors(index);
 }
 function startDefaultBackgroundRotation(){
   // Restore last index if present for continuity
   const savedIdx=parseInt(localStorage.getItem('bgDefaultIdx')||'0',10);
   if(!Number.isNaN(savedIdx)) bgRotationIndex=savedIdx % DEFAULT_BACKGROUNDS.length;
+  // Preload current and neighbors to ensure seamless first swap
+  preloadBg(DEFAULT_BACKGROUNDS[bgRotationIndex]);
+  warmPreloadNeighbors(bgRotationIndex);
   setDefaultBackground(bgRotationIndex);
   clearInterval(bgRotationTimer);
   bgRotationTimer=setInterval(()=>{
